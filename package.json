@@ -1,0 +1,40 @@
+{
+  "name": "forza-telemetry",
+  "version": "0.0.1",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "electron": "wait-on tcp:3333 && IS_DEV=true electron .",
+    "electron:pack": "electron-builder --dir",
+    "electron:dev": "concurrently -k \"BROWSER=none yarn dev\" \"yarn electron\"",
+    "electron:builder": "electron-builder",
+    "build:for:electron": "vue-tsc --noEmit && ELECTRON=true vite build",
+    "app:build": "yarn build:for:electron && yarn electron:builder"
+  },
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "change-case": "^4.1.2",
+    "chart.js": "^3.7.0",
+    "forza-open-telemetry-server": "file:../forza-open-telemetry-server",
+    "has-hover": "^1.0.1",
+    "lodash.debounce": "^4.0.8",
+    "vue": "^3.2.25",
+    "vue-chart-3": "^3.0.5"
+  },
+  "devDependencies": {
+    "@types/lodash.debounce": "^4.0.6",
+    "@vitejs/plugin-vue": "^2.0.0",
+    "autoprefixer": "^10.4.1",
+    "electron": "^16.0.6",
+    "electron-builder": "^22.14.5",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.0.11",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.2",
+    "vue-tsc": "^0.29.8",
+    "wait-on": "^6.0.0"
+  }
+}
