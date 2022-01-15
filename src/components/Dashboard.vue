@@ -15,22 +15,24 @@
       <Suspension :telemetry="selectedLap.telemetry" />
     </div>
   </div>
+  <RawTelemetry :lap="selectedLap" />
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
 import { TelemetryRow } from 'forza-open-telemetry-server/dist';
 import rawData from '../assets/telemetrycapture-race.json';
+import { TelemetryLap } from '../lib';
 import { telemetryArrayToObject } from './sampleData';
 import TravelPath from './TravelPath.vue';
 import Suspension from './Suspension.vue';
-import { TelemetryLap } from '../lib';
+import RawTelemetry from './RawTelemetry.vue';
 
-const raceData = telemetryArrayToObject(rawData)
-  .filter((row) => row.isRaceOn);
+const raceData = telemetryArrayToObject(rawData);
+  // .filter((row) => row.isRaceOn);
 
 export default defineComponent({
-  components: { TravelPath, Suspension },
+  components: { TravelPath, Suspension, RawTelemetry },
   setup() {
     const selectedLapNum = ref(0);
 
@@ -38,21 +40,22 @@ export default defineComponent({
       const laps: TelemetryLap[] = [];
 
       let lastRow: TelemetryLap | null = null;
-      raceData.forEach((row) => {
+      raceData.forEach((row, index) => {
         if (row.isRaceOn) {
           if (!laps[row.lap]) {
             if (laps.length > 1) {
               laps[row.lap - 1].time = row.lastLapTime;
             }
-            console.log('Adding new lap', row.lap);
             laps.push({
               lap: row.lap,
               time: 0,
               telemetry: [],
             });
           }
-          laps[row.lap].time = row.currentLapTime;
-          laps[row.lap].telemetry.push(row);
+          if ((index % 10) === 0 || index === raceData.length - 1) {
+            laps[row.lap].time = row.currentLapTime;
+            laps[row.lap].telemetry.push(row);
+          }
           lastRow = row;
         }
       })

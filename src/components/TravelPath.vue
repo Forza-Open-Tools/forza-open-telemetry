@@ -29,12 +29,21 @@ export default defineComponent({
         data: lap.telemetry.map((row) => ({
           x: row.positionX,
           y: row.positionZ,
+
         })),
         showLine: true,
         label: `Lap ${lap.lap + 1}`,
         borderColor: lapColors[lap.lap],
         backgroundColor: lapColors[lap.lap],
       }));
+
+      datasets.unshift({
+        data: [{ ...(datasets[0].data as { x: number, y: number }[])[0] }],
+        label: 'Start Point',
+        pointBackgroundColor: 'black',
+        pointRadius: 10,
+        pointBorderColor: 'black',
+      });
 
       return {
         datasets
