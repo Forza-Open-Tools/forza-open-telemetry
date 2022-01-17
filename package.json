@@ -33,6 +33,7 @@
     "forza-open-telemetry-server": "file:../forza-open-telemetry-server",
     "has-hover": "^1.0.1",
     "lodash.debounce": "^4.0.8",
+    "socket.io-client": "^4.4.1",
     "vue": "^3.2.25",
     "vue-chart-3": "^3.0.5"
   },

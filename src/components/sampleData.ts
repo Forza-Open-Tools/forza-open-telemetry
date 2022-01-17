@@ -307,15 +307,17 @@ const headers: Record<number, keyof TelemetryRow> = {
 //   [true, 65001984, 7999.995, 900.8784, 900.87885, 0.460808, 0.0058586216, 0.26915863, -0.00248795, 0.001881297, -0.0021655576, -0.0008114913, -9.788422E-05, 0.00028483287, 0.53175396, -0.19056885, -0.08814173, 0.29762214, 0.41372198, 0.42548832, 0.3236398, -0.037715837, 0.08789815, -0.04067772, 0.08696934, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.120000005, 0.120000005, 0.120000005, 0.120000005, -0.14604466, 0.10214273, -0.09320762, 0.017698355, 0.1508361, 0.13475616, 0.10169728, 0.08875189, -0.006778121, 0.010689989, 0.0108805, -0.0047234595, 120, 3, 32, 2, 4, -8037.066, 213.85272, 3068.9888, 0.0037972115, -0.0005011798, -5.312495E-06, 180.97758, 178.14224, 182.38028, 182.38028, -11.024998, 1, -2616.6458, 0, 0, 173.00635, 175.24228, 0, 1, 0, 0, 0, 0, 3, 0, 127, 0],
 // ];
 
-type TelemetryDataRow = (boolean | number)[];
+export type TelemetryDataRow = (boolean | number)[];
 
-export function telemetryArrayToObject(rows: TelemetryDataRow[]): TelemetryRow[] {
-  return rows.map((row) => {
-    return row.reduce((acc, value, index) => ({
-      ...acc,
-      [headers[index]]: value,
-    }), {} as TelemetryRow);
-  });
+export function telemetryArrayToObject(row: TelemetryDataRow) {
+  return row.reduce((acc, value, index) => ({
+    ...acc,
+    [headers[index]]: value,
+  }), {} as TelemetryRow);
+}
+
+export function telemetryArraysToObjects(rows: TelemetryDataRow[]): TelemetryRow[] {
+  return rows.map(telemetryArrayToObject);
 }
 
 // const sampleData = rawData.map((row) => {

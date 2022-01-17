@@ -1,10 +1,11 @@
 <template>
   <div class="flex">
-    <TravelPath :telemetry="laps" />
+    <TravelPath :telemetry="state.laps" />
     <div class="border-green-800 p-4 flex-grow">
+      <h2>{{ socket.connected ? 'Connected' : 'Disconnected' }}</h2>
       <h2>Laps</h2>
       <div
-        v-for="lap in laps"
+        v-for="lap in state.laps"
         :key="lap.lap"
         class="flex cursor-pointer"
         @click="onLapClick(lap.lap)"
@@ -19,60 +20,65 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent, onBeforeUnmount, reactive, ref } from 'vue'
+import { io } from 'socket.io-client';
 import { TelemetryRow } from 'forza-open-telemetry-server/dist';
 import rawData from '../assets/telemetrycapture-race.json';
 import { TelemetryLap } from '../lib';
-import { telemetryArrayToObject } from './sampleData';
+import { telemetryArrayToObject, TelemetryDataRow } from './sampleData';
 import TravelPath from './TravelPath.vue';
 import Suspension from './Suspension.vue';
 import RawTelemetry from './RawTelemetry.vue';
-
-const raceData = telemetryArrayToObject(rawData);
-  // .filter((row) => row.isRaceOn);
+import useSocket from './useSocket';
 
 export default defineComponent({
   components: { TravelPath, Suspension, RawTelemetry },
   setup() {
     const selectedLapNum = ref(0);
 
-    const laps = computed(() => {
-      const laps: TelemetryLap[] = [];
-
-      let lastRow: TelemetryLap | null = null;
-      raceData.forEach((row, index) => {
-        if (row.isRaceOn) {
-          if (!laps[row.lap]) {
-            if (laps.length > 1) {
-              laps[row.lap - 1].time = row.lastLapTime;
-            }
-            laps.push({
-              lap: row.lap,
-              time: 0,
-              telemetry: [],
-            });
-          }
-          if ((index % 10) === 0 || index === raceData.length - 1) {
-            laps[row.lap].time = row.currentLapTime;
-            laps[row.lap].telemetry.push(row);
-          }
-          lastRow = row;
-        }
-      })
-      return laps;
+    const state = reactive({
+      laps: [] as TelemetryLap[],
+      selectedLapNum: 0,
+      connected: false,
+      connectedError: false,
     });
 
-    const selectedLap = computed(() => laps.value[selectedLapNum.value]);
+    const selectedLap = computed(() => state.laps[selectedLapNum.value]);
+
+    function onTelemetry(data: TelemetryDataRow) {
+      const row = telemetryArrayToObject(data);
+      if (row.isRaceOn) {
+        if (!state.laps[row.lap]) {
+          if (state.laps.length > 1) {
+            state.laps[row.lap - 1].time = row.lastLapTime;
+          }
+          state.laps.push({
+            lap: row.lap,
+            time: 0,
+            telemetry: [],
+          });
+        }
+        state.laps[row.lap].time = row.currentLapTime;
+        state.laps[row.lap].telemetry.push(row);
+      }
+    }
+
+    rawData.forEach(onTelemetry);
+
+    // const socket = io('http://localhost:5555');
+    const socket = useSocket();
+
+    socket.on('telemetry', onTelemetry);
 
     function onLapClick(lap: number) {
       selectedLapNum.value = lap;
     }
 
     return {
-      telemetry: raceData,
-      laps,
+      state,
       selectedLap,
       onLapClick,
+      socket: socket.state,
     };
   },
 });

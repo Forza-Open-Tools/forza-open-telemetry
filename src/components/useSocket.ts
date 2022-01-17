@@ -1,0 +1,42 @@
+import { reactive } from 'vue';
+import { io } from 'socket.io-client';
+
+export default function useSocket(port = 5555, host = 'localhost') {
+  const socket = io(`ws://${host}:${port}/`);
+
+  const state = reactive({
+    connected: false,
+    error: false,
+  });
+
+  socket.on('connect', () => {
+    state.connected = true;
+    state.error = false;
+  });
+  socket.on('disconnect', () => {
+    state.connected = false;
+  });
+  socket.on('connect_error', () => {
+    state.connected = false;
+    state.error = true;
+  });
+
+  function on(event: string, callback: (data: any) => void) {
+    socket.on(event, callback);
+  }
+
+  function connect() {
+    socket.connect();
+  }
+
+  onBeforeUnmount(() => {
+    socket.disconnect();
+  });
+
+  return {
+    state,
+    on,
+    connect,
+    disconnect,
+  };
+}
