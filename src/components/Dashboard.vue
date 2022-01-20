@@ -1,6 +1,12 @@
 <template>
+  <div>
+    <label>
+      <input type="checkbox" v-model="state.showTravelPath" />
+      Show Travel Path
+    </label>
+  </div>
   <div class="flex">
-    <TravelPath :telemetry="state.laps" />
+    <TravelPath v-if="state.showTravelPath" :telemetry="state.laps" />
     <div class="border-green-800 p-4 flex-grow">
       <h2>{{ socket.connected ? 'Connected' : 'Disconnected' }}</h2>
       <h2>Laps</h2>
@@ -16,7 +22,7 @@
       <Suspension :telemetry="selectedLap.telemetry" />
     </div>
   </div>
-  <RawTelemetry :lap="selectedLap" />
+  <!-- <RawTelemetry :lap="selectedLap" /> -->
 </template>
 
 <script lang="ts">
@@ -41,6 +47,7 @@ export default defineComponent({
       selectedLapNum: 0,
       connected: false,
       connectedError: false,
+      showTravelPath: true,
     });
 
     const selectedLap = computed(() => state.laps[selectedLapNum.value]);
@@ -48,9 +55,12 @@ export default defineComponent({
     function onTelemetry(data: TelemetryDataRow) {
       const row = telemetryArrayToObject(data);
       if (row.isRaceOn) {
+        if (row.lap < state.laps.length - 1) {
+          state.laps = [];
+        }
         if (!state.laps[row.lap]) {
           if (state.laps.length > 1) {
-            state.laps[row.lap - 1].time = row.lastLapTime;
+            state.laps[state.laps.length - 1].time = row.lastLapTime;
           }
           state.laps.push({
             lap: row.lap,
@@ -58,12 +68,13 @@ export default defineComponent({
             telemetry: [],
           });
         }
+        console.log(state.laps);
         state.laps[row.lap].time = row.currentLapTime;
         state.laps[row.lap].telemetry.push(row);
       }
     }
 
-    rawData.forEach(onTelemetry);
+    // rawData.forEach(onTelemetry);
 
     // const socket = io('http://localhost:5555');
     const socket = useSocket();

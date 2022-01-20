@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { reactive, onBeforeUnmount } from 'vue';
 import { io } from 'socket.io-client';
 
 export default function useSocket(port = 5555, host = 'localhost') {
@@ -37,6 +37,5 @@ export default function useSocket(port = 5555, host = 'localhost') {
     state,
     on,
     connect,
-    disconnect,
   };
 }

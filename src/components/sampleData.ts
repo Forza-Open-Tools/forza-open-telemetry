@@ -1,5 +1,6 @@
 
 const headers: Record<number, keyof TelemetryRow> = {
+  '-1': 'ts',
   0: 'isRaceOn',
   1: 'timestampMS',
   2: 'engineMaxRpm',
@@ -312,7 +313,7 @@ export type TelemetryDataRow = (boolean | number)[];
 export function telemetryArrayToObject(row: TelemetryDataRow) {
   return row.reduce((acc, value, index) => ({
     ...acc,
-    [headers[index]]: value,
+    [headers[index - 1]]: value,
   }), {} as TelemetryRow);
 }
 
