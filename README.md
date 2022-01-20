@@ -23,3 +23,4 @@ Then open http://localhost:3333/ in your browser.
 - [Electron Docs](https://www.electronjs.org/docs/latest/)
 - [Electron Tutorialon tutorialspoint.com](https://www.tutorialspoint.com/electron/electron_quick_guide.htm)
 - [Chart.js Docs](https://www.chartjs.org/docs/latest/)
+- [Forza Open Tune Formatter](https://ldalvik.github.io/ForzaOpenTuneFormatter/) - [(github)](https://github.com/Ldalvik/ForzaOpenTuneFormatter)
