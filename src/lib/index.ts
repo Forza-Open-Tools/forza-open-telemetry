@@ -1,10 +1,4 @@
-export interface TelemetryLap {
-  lap: number;
-  time: number;
-  telemetry: TelemetryRow[];
-}
-
-export interface Rewind {
-  lap: number;
-  time: number;
-}
+export { default as LapStatistics } from './LapStatistics';
+export { default as Statistics } from './Statistics';
+export { default as TelemetryLap } from './TelemetryLap';
+// export { default as } from './';

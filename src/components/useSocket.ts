@@ -2,7 +2,9 @@ import { reactive, onBeforeUnmount } from 'vue';
 import { io } from 'socket.io-client';
 
 export default function useSocket(port = 5555, host = 'localhost') {
-  const socket = io(`ws://${host}:${port}/`);
+  const socket = io(`ws://${host}:${port}/`, {
+    autoConnect: false,
+  });
 
   const state = reactive({
     connected: false,
@@ -29,6 +31,10 @@ export default function useSocket(port = 5555, host = 'localhost') {
     socket.connect();
   }
 
+  function disconnect() {
+    socket.disconnect();
+  }
+
   onBeforeUnmount(() => {
     socket.disconnect();
   });
@@ -37,5 +43,6 @@ export default function useSocket(port = 5555, host = 'localhost') {
     state,
     on,
     connect,
+    disconnect,
   };
 }
