@@ -13,9 +13,3 @@ import Dashboard from './components/Dashboard.vue'
 <template>
   <Dashboard />
 </template>
-
-<style>
-#app {
-  margin: 20px;
-}
-</style>

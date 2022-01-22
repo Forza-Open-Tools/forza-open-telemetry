@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  @apply h-screen;
+}
+
+button, .button {
+  @apply
+    border
+    border-black
+    rounded
+    p-2;
+}
+
+th, td {
+  @apply py-1 px-2;
+}
