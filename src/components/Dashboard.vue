@@ -20,50 +20,67 @@
         Show Detail Table
       </label>
       <button class="ml-8" type="button" @click="onToggleStream">{{ streamingButtonText }} Streaming</button>
+      <div>
+        <label>Throttle:</label>
+        <input type="text" v-model="state.throttle" />
+      </div>
     </div>
     <template v-if="state.laps.length">
       <div class="flex">
-        <TravelPath v-if="state.show.travelPath" :telemetry="state.laps" />
-        <div class="border-green-800 p-4 flex-grow">
-          <h2>{{ socket.connected ? 'Connected' : 'Disconnected' }}</h2>
-          <h2>Laps</h2>
-          <div
-            v-for="lap in state.laps"
-            :key="lap.lap"
-            class="flex cursor-pointer"
-            @click="onLapClick(lap.lap)"
-          >
-            <div class="w-10">{{ lap.lap + 1 }}</div>
-            <div>{{ lap.time }}</div>
-          </div>
-          <Suspension v-if="state.show.suspension" :telemetry="selectedLap.telemetry" />
-        </div>
+        <TravelPath v-if="state.show.travelPath" :laps="state.laps" />
       </div>
+      <h2>{{ socket.connected ? 'Connected' : 'Disconnected' }}</h2>
+      <div class="flex">
+        <LapTable v-model="state.selectedLapIndex" :laps="state.laps" />
+        <StatisticsForLap :lap="selectedLap" />
+        <Suspension v-if="state.show.suspension" :telemetry="selectedLap.telemetry" />
+      </div>
+      <TelemetryMoment :lap="selectedLap" />
       <RawTelemetry v-if="state.show.telemetryTable" :lap="selectedLap" />
     </template>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, reactive, ref } from 'vue'
-import { io } from 'socket.io-client';
-import { TelemetryRow } from 'forza-open-telemetry-server/dist';
-import rawData from '../assets/telemetrycapture-race.json';
-import { TelemetryLap } from '../lib';
-import { telemetryArrayToObject, TelemetryDataRow } from './sampleData';
+import { computed, defineComponent, reactive, ref } from 'vue'
 import TravelPath from './TravelPath.vue';
 import Suspension from './Suspension.vue';
 import RawTelemetry from './RawTelemetry.vue';
 import useSocket from './useSocket';
+import { TelemetryDataRow } from '../lib/types';
+import { TelemetryLap } from '../lib';
+import { convertTelemetryArray } from '../lib/utils';
+import { TelemetryRow } from 'forza-open-telemetry-server';
+import StatisticsForLap from './StatisticsForLap.vue';
+import LapTable from './LapTable.vue';
+import TelemetryMoment from './TelemetryMoment.vue';
+
+interface DashboardState {
+  throttle: number;
+  laps: TelemetryLap[];
+  previousLap: TelemetryLap | null;
+  currentLap: TelemetryLap | null;
+  selectedLapIndex: number;
+  connected: boolean;
+  connectedError: boolean;
+  show: {
+    travelPath: boolean;
+    suspension: boolean;
+    telemetryTable: boolean;
+  };
+  streaming: boolean;
+  wrapperClass: string;
+}
 
 export default defineComponent({
-  components: { TravelPath, Suspension, RawTelemetry },
+  components: { TravelPath, Suspension, RawTelemetry, StatisticsForLap, LapTable, TelemetryMoment },
   setup() {
-    const selectedLapNum = ref(0);
-
-    const state = reactive({
-      laps: [] as TelemetryLap[],
-      selectedLapNum: 0,
+    const state = reactive<DashboardState>({
+      throttle: 30,
+      laps: [],
+      previousLap: null,
+      currentLap: null,
+      selectedLapIndex: 0,
       connected: false,
       connectedError: false,
       show: {
@@ -75,46 +92,44 @@ export default defineComponent({
       wrapperClass: '',
     });
 
-    const selectedLap = computed(() => state.laps[selectedLapNum.value]);
+    const selectedLap = computed<TelemetryLap>(() => state.laps[state.selectedLapIndex] as TelemetryLap);
     const streamingButtonText = computed(() => state.streaming ? 'Stop' : 'Start');
 
-    function onTelemetry(data: TelemetryDataRow) {
-      const row = telemetryArrayToObject(data);
-      if (row.isRaceOn) {
-        if (row.lap < state.laps.length - 1) {
-          state.laps = [];
-        }
-        if (!state.laps[row.lap]) {
-          if (state.laps.length > 1) {
-            state.laps[state.laps.length - 1].time = row.lastLapTime;
-          }
-          state.laps.push({
-            lap: row.lap,
-            time: 0,
-            telemetry: [],
-            stats:
-          });
-        }
-        try {
-          state.laps[row.lap].time = row.currentLapTime;
-          state.laps[row.lap].telemetry.push(row);
-        } catch (error) {
-          console.error(error);
-          console.log(JSON.stringify(row));
-        }
+    function createLap(row: TelemetryRow) {
+      const lap = new TelemetryLap(row.lap);
+      state.laps.push(lap);
+      state.previousLap = state.currentLap;
+      state.currentLap = lap;
+
+      if (state.previousLap && row.lastLapTime) {
+        state.previousLap.updateTime(row.lastLapTime);
       }
     }
 
-    // rawData.forEach(onTelemetry);
+    let throttleCounter = 0;
+
+    function onTelemetry(data: TelemetryDataRow) {
+      if (throttleCounter % 10 === 0) {
+        const row = convertTelemetryArray(data);
+        if (!row.isRaceOn) return;
+        if (!state.currentLap || row.lap > state.currentLap.lap) {
+          createLap(row);
+        }
+        state.currentLap?.add(row);
+      }
+      throttleCounter += 1;
+    }
+
+    function clear() {
+      state.laps = [];
+      state.previousLap = null;
+      state.currentLap = null;
+    }
 
     // const socket = io('http://localhost:5555');
     const socket = useSocket();
 
     socket.on('telemetry', onTelemetry);
-
-    function onLapClick(lap: number) {
-      selectedLapNum.value = lap;
-    }
 
     function onToggleStream() {
       if (state.streaming) {
@@ -159,7 +174,7 @@ export default defineComponent({
           if (file) {
             const rows = await parseFile(file);
             console.log('Recieved', rows.length, 'telemetry lines');
-            state.laps = [];
+            clear();
             rows.forEach(onTelemetry);
           }
         }
@@ -180,7 +195,6 @@ export default defineComponent({
       socket: socket.state,
       streamingButtonText,
       onToggleStream,
-      onLapClick,
       onFileDrop,
       onDragOver,
       onDragLeave,

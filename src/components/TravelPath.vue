@@ -18,14 +18,14 @@ const lapColors = [
 export default defineComponent({
   components: { ScatterChart },
   props: {
-    telemetry: {
-      type: Array as PropType<TelemetryLap[]>,
+    laps: {
+      type: Object as PropType<TelemetryLap[]>,
       required: true,
     },
   },
   setup(props) {
     const data = computed<ChartData<'scatter'>>(() => {
-      const datasets = props.telemetry.map<ChartDataset<'scatter'>>((lap) => ({
+      const datasets = props.laps.map<ChartDataset<'scatter'>>((lap) => ({
         data: lap.telemetry.map((row) => ({
           x: row.positionX,
           y: row.positionZ,

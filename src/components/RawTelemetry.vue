@@ -3,19 +3,20 @@
   <table>
     <thead>
       <tr>
-        <th colspan="8"></th>
+        <th colspan="9"></th>
+        <th colspan="4" class="border-l border-black">Tire Temp</th>
         <th colspan="4" class="border-l border-black">Suspension Travel</th>
         <th colspan="4" class="border-l border-black">Normalized Susp</th>
         <th colspan="4" class="border-l border-black">Tire Slip</th>
         <th colspan="4" class="border-l border-black">Tire Slip Angle</th>
         <th colspan="4" class="border-l border-black">Tire Combined Slip</th>
-        <th colspan="4" class="border-l border-black">Tire Temp</th>
         <th colspan="5" class="border-l border-black"></th>
         <th></th>
       </tr>
       <tr>
         <th>Row #</th>
         <th>Elapsed Time</th>
+        <th>Lap</th>
         <th>Lap Time</th>
         <th>Race Time</th>
         <th>Position</th>
@@ -64,12 +65,17 @@
       >
         <td>{{ index + 1 }}</td>
         <td>{{ formatLapTime(row.timestampMS - startTs) }}</td>
+        <td class="text-center">{{ row.lap }}</td>
         <td>{{ formatLapTime(row.currentLapTime * 1000) }}</td>
         <td>{{ formatLapTime(row.currentRaceTime * 1000) }}</td>
         <td class="text-center">{{ row.racePosition }}</td>
         <td>{{ Math.round(row.speed * 10) / 10 }}</td>
         <td>{{ row.gear }}</td>
         <td>{{ Math.round(row.currentEngineRpm) }}</td>
+        <td class="border-l border-black">{{ Math.round(row.tireTempFrontLeft * 10) / 10 }}</td>
+        <td>{{ Math.round(row.tireTempFrontRight * 10) / 10 }}</td>
+        <td>{{ Math.round(row.tireTempRearLeft * 10) / 10 }}</td>
+        <td>{{ Math.round(row.tireTempRearRight * 10) / 10 }}</td>
         <td
           class="border-l border-black"
         >{{ Math.round(row.suspensionTravelMetersFrontLeft * 10000) / 100 }}</td>
@@ -96,10 +102,6 @@
         <td>{{ Math.round(row.tireCombinedSlipFrontRight * 100) / 100 }}</td>
         <td>{{ Math.round(row.tireCombinedSlipRearLeft * 100) / 100 }}</td>
         <td>{{ Math.round(row.tireCombinedSlipRearRight * 100) / 100 }}</td>
-        <td class="border-l border-black">{{ Math.round(row.tireTempFrontLeft * 10) / 10 }}</td>
-        <td>{{ Math.round(row.tireTempFrontRight * 10) / 10 }}</td>
-        <td>{{ Math.round(row.tireTempRearLeft * 10) / 10 }}</td>
-        <td>{{ Math.round(row.tireTempRearRight * 10) / 10 }}</td>
         <td class="border-l border-black">{{ row.brake }}</td>
         <td>{{ row.clutch }}</td>
         <td>{{ row.handbrake }}</td>
@@ -112,9 +114,9 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from "vue";
-import dayjs from 'dayjs';
 import { ScatterChart } from 'vue-chart-3';
 import { TelemetryLap } from '../lib';
+import { formatLapTime } from '../lib/utils';
 
 export default defineComponent({
   components: { ScatterChart },
@@ -127,9 +129,7 @@ export default defineComponent({
   setup(props) {
     const startTs = computed(() => props.lap.telemetry[0].timestampMS)
 
-    function formatLapTime(time: number): string {
-      return dayjs(time).format('m:ss.SSS');
-    }
+
     return {
       startTs,
       formatLapTime,

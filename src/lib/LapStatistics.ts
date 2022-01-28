@@ -27,6 +27,8 @@ export default class LapStatistics {
   tireTempRearLeft = new Statistics();
   tireTempRearRight = new Statistics();
   speed = new Statistics();
+  positionX = new Statistics();
+  positionZ = new Statistics();
 
   add(row: TelemetryRow) {
     this.normalizedSuspensionTravelFrontLeft.add(row.normalizedSuspensionTravelFrontLeft);
@@ -54,5 +56,7 @@ export default class LapStatistics {
     this.tireTempRearLeft.add(row.tireTempRearLeft);
     this.tireTempRearRight.add(row.tireTempRearRight);
     this.speed.add(row.speed);
+    this.positionX.add(row.positionX);
+    this.positionZ.add(row.positionZ);
   }
 }

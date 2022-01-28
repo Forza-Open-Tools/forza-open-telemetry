@@ -14,6 +14,33 @@ button, .button {
     p-2;
 }
 
+label {
+  @apply
+    block
+    text-sm;
+}
+
+input {
+  @apply
+    border
+    border-black
+    rounded
+    px-2
+    py-1;
+}
+
 th, td {
   @apply py-1 px-2;
+}
+
+tr.multi-row th {
+  @apply pb-0;
+}
+
+tr.multi-row+tr.multi-row th {
+  @apply pt-0;
+}
+
+tr th:last-child {
+  @apply border-r border-black;
 }
