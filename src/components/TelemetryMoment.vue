@@ -1,78 +1,25 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { TelemetryLap } from '../lib';
 import { formatAsPercent } from '../lib/utils';
 import TelemetryCorner from './TelemetryCorner.vue';
 import TelemetryMap from './TelemetryMap.vue';
+import TelemetryTimeline from './TelemetryTimeline.vue';
+import Speedometer from './Speedometer.vue';
 
 const props = defineProps<{
   lap: TelemetryLap;
 }>();
 
-const telemetry = computed(() => props.lap.telemetry[state.currentIndex]);
-
 const state = reactive({
   currentIndex: 0,
-  playing: false,
-  timeout: 0,
 });
 
-const timelineRef = ref<HTMLElement>();
-
-const markerPos = computed(() => {
-  if (!timelineRef.value) return 0;
-  const width = timelineRef.value.getBoundingClientRect().width;
-  const ratio = width / props.lap.telemetry.length;
-  const pos = state.currentIndex * ratio;
-  console.log('markerPos', pos);
-  return pos;
+watch(() => props.lap, () => {
+  state.currentIndex = 0;
 })
 
-function startInterval() {
-  state.timeout = window.setInterval(() => {
-    state.currentIndex += 3;
-    if (state.currentIndex >= props.lap.telemetry.length) {
-      state.currentIndex = props.lap.telemetry.length - 1;
-      clearInterval(state.timeout);
-    }
-  }, 600);
-}
-
-function onBackClick() {
-  // clearInterval(state.timeout);
-  // if (state.playing) {
-  //   startInterval();
-  // }
-  state.currentIndex = 0;
-}
-
-function onPlayClick() {
-  if (state.playing) {
-    clearInterval(state.timeout);
-    state.playing = false;
-  } else {
-    startInterval()
-    state.playing = true;
-  }
-}
-
-onBeforeUnmount(() => {
-  clearTimeout(state.timeout);
-});
-
-function onTimelineClick(e: MouseEvent) {
-  if (timelineRef.value) {
-    const width = timelineRef.value.getBoundingClientRect().width;
-    const index = Math.floor(e.offsetX / width * (props.lap.telemetry.length - 1));
-    console.log({
-      offsetX: e.offsetX,
-      width,
-      percent: e.offsetX / width,
-      index,
-    });
-    state.currentIndex = index;
-  }
-}
+const telemetry = computed(() => props.lap.telemetry[state.currentIndex]);
 </script>
 <template>
   <div>
@@ -89,24 +36,20 @@ function onTimelineClick(e: MouseEvent) {
       <TelemetryCorner corner="FrontLeft" :row="telemetry" />
       <TelemetryCorner corner="RearLeft" :row="telemetry" />
     </div>
-    <div class="flex-grow flex justify-center">
-      <TelemetryMap :lap="lap" :current="telemetry" />
-    </div>
+    <div class="w-32">&nbsp;</div>
     <div class="flex flex-col justify-between">
       <TelemetryCorner corner="FrontRight" :row="telemetry" />
       <TelemetryCorner corner="RearRight" :row="telemetry" />
     </div>
+    <div class="w-[250px]">
+      <Speedometer :row="telemetry" />
+    </div>
+    <div class="flex-grow flex justify-center">
+      <TelemetryMap :lap="lap" :current="telemetry" />
+    </div>
   </div>
 
-  <div class="flex mt-8">
-    <div>
-      <button type="button" @click="onPlayClick">Play</button>
-    </div>
-    <div ref="timelineRef" class="timeline" @click="onTimelineClick">
-      <div class="timeline-line">&nbsp;</div>
-      <div class="marker" :style="{ left: `${markerPos}px` }"></div>
-    </div>
-  </div>
+  <TelemetryTimeline v-model="state.currentIndex" :lap="lap" />
 </template>
 
 <style>

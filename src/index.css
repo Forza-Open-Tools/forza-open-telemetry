@@ -6,27 +6,23 @@ body {
   @apply h-screen;
 }
 
-button, .button {
-  @apply
-    border
-    border-black
-    rounded
-    p-2;
-}
-
-label {
-  @apply
-    block
-    text-sm;
-}
-
-input {
+input,
+select,
+textarea,
+button,
+.button {
   @apply
     border
     border-black
     rounded
     px-2
     py-1;
+}
+
+label {
+  @apply
+    block
+    text-sm;
 }
 
 th, td {

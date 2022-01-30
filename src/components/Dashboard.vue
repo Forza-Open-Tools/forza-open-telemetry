@@ -76,7 +76,7 @@ export default defineComponent({
   components: { TravelPath, Suspension, RawTelemetry, StatisticsForLap, LapTable, TelemetryMoment },
   setup() {
     const state = reactive<DashboardState>({
-      throttle: 30,
+      throttle: 0,
       laps: [],
       previousLap: null,
       currentLap: null,
@@ -86,7 +86,7 @@ export default defineComponent({
       show: {
         travelPath: false,
         suspension: false,
-        telemetryTable: true,
+        telemetryTable: false,
       },
       streaming: false,
       wrapperClass: '',
@@ -109,13 +109,21 @@ export default defineComponent({
     let throttleCounter = 0;
 
     function onTelemetry(data: TelemetryDataRow) {
-      if (throttleCounter % 10 === 0) {
+      if (!state.throttle || (throttleCounter % state.throttle === 0)) {
         const row = convertTelemetryArray(data);
         if (!row.isRaceOn) return;
         if (!state.currentLap || row.lap > state.currentLap.lap) {
           createLap(row);
         }
-        state.currentLap?.add(row);
+        if (state.currentLap && row.lap < state.currentLap.lap) {
+          console.log('Lap # reset to', row.lap);
+        }
+        if (state.currentLap) {
+          state.currentLap?.add(row);
+        } else {
+          console.error('current lap not available!');
+          throw new Error('current lap not available!');
+        }
       }
       throttleCounter += 1;
     }
@@ -124,6 +132,7 @@ export default defineComponent({
       state.laps = [];
       state.previousLap = null;
       state.currentLap = null;
+      throttleCounter = 0;
     }
 
     // const socket = io('http://localhost:5555');
@@ -167,6 +176,7 @@ export default defineComponent({
     async function onFileDrop(event: DragEvent) {
       console.log('File dropped');
       state.wrapperClass = '';
+      clear();
 
       if (event.dataTransfer?.items) {
         for (let index = 0; index < event.dataTransfer.items.length; index++) {
@@ -176,6 +186,9 @@ export default defineComponent({
             console.log('Recieved', rows.length, 'telemetry lines');
             clear();
             rows.forEach(onTelemetry);
+            const totalRows = state.laps.reduce((acc, lap) => acc + lap.telemetry.length, 0);
+            console.log('throttle count', throttleCounter);
+            console.log('Processed', totalRows);
           }
         }
       }
