@@ -24,25 +24,27 @@
         <label>Throttle:</label>
         <input type="text" v-model="state.throttle" />
       </div>
+      <div>Tire slip index: {{ state.slipIndex }}</div>
     </div>
     <template v-if="state.laps.length">
       <div class="flex">
         <TravelPath v-if="state.show.travelPath" :laps="state.laps" />
       </div>
       <h2>{{ socket.connected ? 'Connected' : 'Disconnected' }}</h2>
-      <div class="flex">
+      <TelemetryMoment :lap="selectedLap">
         <LapTable v-model="state.selectedLapIndex" :laps="state.laps" />
+      </TelemetryMoment>
+      <div class="flex">
         <StatisticsForLap :lap="selectedLap" />
         <Suspension v-if="state.show.suspension" :telemetry="selectedLap.telemetry" />
       </div>
-      <TelemetryMoment :lap="selectedLap" />
       <RawTelemetry v-if="state.show.telemetryTable" :lap="selectedLap" />
     </template>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref } from 'vue'
+import { computed, defineComponent, onMounted, reactive, ref } from 'vue'
 import TravelPath from './TravelPath.vue';
 import Suspension from './Suspension.vue';
 import RawTelemetry from './RawTelemetry.vue';
@@ -54,6 +56,7 @@ import { TelemetryRow } from 'forza-open-telemetry-server';
 import StatisticsForLap from './StatisticsForLap.vue';
 import LapTable from './LapTable.vue';
 import TelemetryMoment from './TelemetryMoment.vue';
+import raceData from '../assets/sampleRaceData.json';
 
 interface DashboardState {
   throttle: number;
@@ -70,6 +73,7 @@ interface DashboardState {
   };
   streaming: boolean;
   wrapperClass: string;
+  slipIndex: number;
 }
 
 export default defineComponent({
@@ -90,6 +94,7 @@ export default defineComponent({
       },
       streaming: false,
       wrapperClass: '',
+      slipIndex: -1,
     });
 
     const selectedLap = computed<TelemetryLap>(() => state.laps[state.selectedLapIndex] as TelemetryLap);
@@ -150,27 +155,40 @@ export default defineComponent({
       }
     }
 
+    function parseText(text: string) {
+      const lines = text.split(/\r?\n/g);
+      const rows: TelemetryDataRow[] = [];
+      lines.forEach((line, index) => {
+        if (line.trim()) {
+          try {
+            rows.push(JSON.parse(line) as TelemetryDataRow);
+          } catch (error) {
+            console.error('Error parsing line', index);
+            console.log(line);
+          }
+        }
+      });
+      return rows;
+    }
+
     function parseFile(file: File): Promise<TelemetryDataRow[]> {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (event) => {
           const result: string = event.target?.result as string || '';
-          const lines = result.split(/\r?\n/g);
-          const rows: TelemetryDataRow[] = [];
-          lines.forEach((line, index) => {
-            if (line.trim()) {
-              try {
-                rows.push(JSON.parse(line) as TelemetryDataRow);
-              } catch (error) {
-                console.error('Error parsing line', index);
-                console.log(line);
-              }
-            }
-          });
+          const rows = parseText(result);
           resolve(rows);
         }
         reader.readAsText(file);
       })
+    }
+
+    function parseDataRows(rows: TelemetryDataRow[]) {
+      rows.forEach(onTelemetry);
+      state.slipIndex = state.laps[0].telemetry.findIndex((row) => row.tireSlipRatioFrontLeft > 1);
+      const totalRows = state.laps.reduce((acc, lap) => acc + lap.telemetry.length, 0);
+      console.log('throttle count', throttleCounter);
+      console.log('Processed', totalRows);
     }
 
     async function onFileDrop(event: DragEvent) {
@@ -184,15 +202,19 @@ export default defineComponent({
           if (file) {
             const rows = await parseFile(file);
             console.log('Recieved', rows.length, 'telemetry lines');
-            clear();
-            rows.forEach(onTelemetry);
-            const totalRows = state.laps.reduce((acc, lap) => acc + lap.telemetry.length, 0);
-            console.log('throttle count', throttleCounter);
-            console.log('Processed', totalRows);
+            parseDataRows(rows);
           }
         }
       }
     }
+
+    function loadSampleData() {
+      parseDataRows(raceData);
+    }
+
+    onMounted(() => {
+      loadSampleData();
+    });
 
     function onDragOver() {
       state.wrapperClass = 'wrapper-dragover';

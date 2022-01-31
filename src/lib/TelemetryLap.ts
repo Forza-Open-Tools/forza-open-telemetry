@@ -5,6 +5,7 @@ export default class TelemetryLap {
   lap = 0;
   time = 0;
   telemetry: TelemetryRow[] = [];
+  issues: TelemetryRow[] = [];
   stats: LapStatistics = new LapStatistics();
 
   constructor(lap: number) {
@@ -15,6 +16,10 @@ export default class TelemetryLap {
     this.telemetry.push(row);
     this.stats.add(row);
     this.time = row.currentLapTime;
+
+    if (row.) {
+
+    }
   }
 
   updateTime(time: number) {

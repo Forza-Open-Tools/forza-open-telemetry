@@ -41,7 +41,8 @@ const telemetry = computed(() => props.lap.telemetry[state.currentIndex]);
       <TelemetryCorner corner="FrontRight" :row="telemetry" />
       <TelemetryCorner corner="RearRight" :row="telemetry" />
     </div>
-    <div class="w-[250px]">
+    <div class="w-[250px] flex flex-col justify-between">
+      <slot />
       <Speedometer :row="telemetry" />
     </div>
     <div class="flex-grow flex justify-center">

@@ -48,9 +48,27 @@ const startAngle = computed(() => {
 
 </script>
 <template>
-  <div>{{ Math.round(row.engineMaxRpm) }}</div>
-  <div>Start Angle: {{ startAngle }}</div>
-  <svg viewBox="0 0 100 70" class="bg-transparent w-full border-black border">
-    <circle cx="50" cy="50" r="48" stroke="black" fill="transparent" />
-  </svg>
+  <div class="relative">
+    <div>{{ Math.round(row.engineMaxRpm) }}</div>
+    <div>Start Angle: {{ startAngle }}</div>
+    <div>Speed: {{ Math.round(row.speed) }} kph</div>
+    <div>RPMs: {{ Math.round(row.currentEngineRpm) }}</div>
+    <div class="relative">
+      <svg viewBox="0 0 100 70" class="bg-transparent w-full border-black border">
+        <circle cx="50" cy="50" r="48" stroke="black" fill="transparent" />
+      </svg>
+      <div class="needle"></div>
+    </div>
+  </div>
 </template>
+
+<style>
+.needle {
+  @apply absolute
+    w-1
+    h-[95px]
+    bg-black
+    bottom-[52px]
+    left-1/2;
+}
+</style>

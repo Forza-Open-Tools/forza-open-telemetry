@@ -12,6 +12,12 @@ const temp = computed(() => props.row[name.value]);
 
 const formatted = computed(() => formatAsTemp(temp.value));
 
+const slipValues = computed(() => ({
+  combined: (Math.round(props.row[`tireCombinedSlip${props.corner}` as keyof TelemetryRow] * 10) / 10).toFixed(1),
+  ratio: (Math.round(props.row[`tireSlipRatio${props.corner}` as keyof TelemetryRow] * 10) / 10).toFixed(1),
+  angle: (Math.round(props.row[`tireSlipAngle${props.corner}` as keyof TelemetryRow] * 10) / 10).toFixed(1),
+}));
+
 const color = computed(() => {
 
   if (temp.value < 80) {
@@ -55,7 +61,19 @@ const colors = [
 ];
 </script>
 <template>
-  <div class="tire" :class="color">{{ formatted }}</div>
+  <div class="tire" :class="color">
+    <div class="mb-4">{{ formatted }}</div>
+    <div>
+      <div class="tire-slip">
+        N {{ slipValues.combined }}
+        <br />
+        R {{ slipValues.ratio }}
+        <br />
+        A {{ slipValues.angle }}
+        <br />
+      </div>
+    </div>
+  </div>
 </template>
 
 <style>
@@ -66,7 +84,17 @@ const colors = [
     border-gray-600
     rounded-3xl
     flex
+    flex-col
     justify-center
     items-center;
+}
+
+.tire-slip {
+  @apply rounded-full
+    w-[60px]
+    h-[60px]
+    border-8
+    border-green-100
+    text-center;
 }
 </style>
