@@ -6,7 +6,7 @@
     @dragleave="onDragLeave"
     @drop.prevent="onFileDrop"
   >
-    <div class="flex items-center p-2 border-b border-gray-700">
+    <!-- <div class="flex items-center p-2 border-b border-gray-700">
       <label>
         <input type="checkbox" v-model="state.show.travelPath" />
         Show Travel Path
@@ -25,20 +25,20 @@
         <input type="text" v-model="state.throttle" />
       </div>
       <div>Tire slip index: {{ state.slipIndex }}</div>
-    </div>
+    </div>-->
     <template v-if="state.laps.length">
       <div class="flex">
         <TravelPath v-if="state.show.travelPath" :laps="state.laps" />
       </div>
-      <h2>{{ socket.connected ? 'Connected' : 'Disconnected' }}</h2>
-      <TelemetryMoment :lap="selectedLap">
+      <!-- <h2>{{ socket.connected ? 'Connected' : 'Disconnected' }}</h2> -->
+      <TelemetryMoment :lap="selectedLap" :laps="state.laps">
         <LapTable v-model="state.selectedLapIndex" :laps="state.laps" />
       </TelemetryMoment>
       <div class="flex">
-        <StatisticsForLap :lap="selectedLap" />
-        <Suspension v-if="state.show.suspension" :telemetry="selectedLap.telemetry" />
+        <!-- <StatisticsForLap :lap="selectedLap" /> -->
+        <!-- <Suspension v-if="state.show.suspension" :telemetry="selectedLap.telemetry" /> -->
       </div>
-      <RawTelemetry v-if="state.show.telemetryTable" :lap="selectedLap" />
+      <!-- <RawTelemetry v-if="state.show.telemetryTable" :lap="selectedLap" /> -->
     </template>
   </div>
 </template>

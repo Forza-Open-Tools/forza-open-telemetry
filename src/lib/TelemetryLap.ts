@@ -1,6 +1,7 @@
 import { TelemetryRow } from 'forza-open-telemetry-server';
+import getLapColorClass from './lapColors';
 import LapStatistics from './LapStatistics';
-import { CarCorner } from './types';
+import { CarCorner, LapColorClasses } from './types';
 
 const corners = [
   CarCorner.frontLeft,
@@ -30,9 +31,11 @@ export default class TelemetryLap {
   telemetry: TelemetryRow[] = [];
   issues: TelemetryRow[] = [];
   stats: LapStatistics = new LapStatistics();
+  colorClasses: LapColorClasses;
 
   constructor(lap: number) {
     this.lap = lap;
+    this.colorClasses = getLapColorClass(lap);
   }
 
   add(row: TelemetryRow) {
@@ -40,18 +43,18 @@ export default class TelemetryLap {
     this.stats.add(row);
     this.time = row.currentLapTime;
 
-    if (this.checkSuspension(row) || this.checkSlip(row) || this.checkTireTemp(row)) {
-      this.issues.push(row);
-    }
+    // if (this.checkSuspension(row) || this.checkSlip(row) || this.checkTireTemp(row)) {
+    //   this.issues.push(row);
+    // }
   }
 
   private checkSuspension(row: TelemetryRow): boolean {
     return getCornerValues(row, 'normalizedSuspensionTravel')
-      .some((value) => value < 20 || value > 80);
+      .some((value) => value < 0.2 || value > 0.8);
   }
 
   private checkSlip(row: TelemetryRow): boolean {
-    return getCornerValues(row, 'tireSlipRatio')
+    return getCornerValues(row, 'tireCombinedSlip')
       .some((value) => value >= 1)
   }
 

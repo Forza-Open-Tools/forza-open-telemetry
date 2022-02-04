@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { TelemetryLap } from '../lib';
-import { formatAsPercent } from '../lib/utils';
 import TelemetryCorner from './TelemetryCorner.vue';
 import TelemetryMap from './TelemetryMap.vue';
 import TelemetryTimeline from './TelemetryTimeline.vue';
-import Speedometer from './Speedometer.vue';
 import { CarCorner } from '../lib/types';
+import { formatLapTime } from '../lib/utils';
 
 const props = defineProps<{
   lap: TelemetryLap;
+  laps: TelemetryLap[];
 }>();
 
 const state = reactive({
@@ -18,12 +18,35 @@ const state = reactive({
 
 watch(() => props.lap, () => {
   state.currentIndex = 0;
-})
+});
 
-const telemetry = computed(() => props.lap.telemetry[state.currentIndex]);
+const arrowKeys: Record<string, number> = {
+  ArrowLeft: -1,
+  ArrowRight: 1,
+};
+
+function onArrowKeyPress(e: KeyboardEvent) {
+  console.log('document keypress');
+  if (e.key in arrowKeys) {
+    console.log(e.key);
+    e.preventDefault();
+    let modifier = arrowKeys[e.key];
+    if (e.ctrlKey) modifier *= 10;
+    else if (e.shiftKey) modifier *= 30;
+    state.currentIndex += modifier;
+  }
+}
+
+document.addEventListener('keydown', onArrowKeyPress);
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', onArrowKeyPress);
+});
+
+const currentRow = computed(() => props.lap.telemetry[state.currentIndex]);
 </script>
 <template>
-  <div>
+  <!-- <div>
     <label>Current Point in Time</label>
     <input
       v-model.number="state.currentIndex"
@@ -31,30 +54,48 @@ const telemetry = computed(() => props.lap.telemetry[state.currentIndex]);
       min="0"
       :max="lap.telemetry.length - 1"
     />
-  </div>
+  </div>-->
   <div class="flex w-full mt-8">
     <div class="flex flex-col justify-between">
-      <TelemetryCorner :corner="CarCorner.frontLeft" :row="telemetry" />
-      <TelemetryCorner :corner="CarCorner.rearLeft" :row="telemetry" />
+      <TelemetryCorner :corner="CarCorner.frontLeft" :row="currentRow" />
+      <TelemetryCorner :corner="CarCorner.rearLeft" :row="currentRow" />
     </div>
     <div class="w-32">&nbsp;</div>
     <div class="flex flex-col justify-between">
-      <TelemetryCorner :corner="CarCorner.frontRight" :row="telemetry" />
-      <TelemetryCorner :corner="CarCorner.rearRight" :row="telemetry" />
+      <TelemetryCorner :corner="CarCorner.frontRight" :row="currentRow" />
+      <TelemetryCorner :corner="CarCorner.rearRight" :row="currentRow" />
     </div>
-    <div class="w-[250px] flex flex-col justify-between">
-      <slot />
+    <div class="w-[300px] mx-4 flex flex-col justify-between">
+      <div>
+        <slot />
+        <div class="text-xl font-bold">
+          <div class="flex justify-between">
+            <div>Current Lap Time:</div>
+            <div>{{ formatLapTime(currentRow.currentLapTime * 1000) }}</div>
+          </div>
+          <div class="flex justify-between">
+            <div>Current Race Time:</div>
+            <div>{{ formatLapTime(currentRow.currentRaceTime * 1000) }}</div>
+          </div>
+        </div>
+      </div>
       <!-- <Speedometer :row="telemetry" /> -->
     </div>
-    <div class="flex justify-center">
-      <TelemetryMap :lap="lap" :current="telemetry" />
+    <div class="relative w-[500px] h-[500px]">
+      <TelemetryMap
+        v-for="l in laps"
+        :key="l.lap"
+        :lap="l"
+        class="absolute top-0 left-0"
+        :class="{ 'z-20': l.lap === lap.lap }"
+        :current="l.lap === lap.lap ? currentRow : undefined"
+      />
     </div>
   </div>
-
   <TelemetryTimeline v-model="state.currentIndex" :lap="lap" />
 </template>
 
-<style lang="postcss">
+<style>
 .side {
   @apply flex;
 }

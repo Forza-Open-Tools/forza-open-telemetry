@@ -8,15 +8,65 @@ const props = defineProps<{
   corner: CarCorner;
 }>();
 
+const tempColors = [
+  // 'bg-blue-900',
+  // 'bg-blue-800',
+  // 'bg-blue-700',
+  // 'bg-blue-600',
+  'bg-blue-400 bg-opacity-30',
+  'bg-blue-400 bg-opacity-50',
+  'bg-blue-300',
+  'bg-blue-200',
+  'bg-blue-100',
+  'bg-white',
+  'bg-white',
+  'bg-white',
+  'bg-white',
+  'bg-white',
+  'bg-yellow-300',
+  'bg-yellow-300',
+  'bg-yellow-300',
+  'bg-yellow-300',
+  'bg-yellow-300',
+  'bg-yellow-300',
+  'bg-yellow-400',
+  'bg-yellow-400',
+  'bg-yellow-400',
+  'bg-yellow-400',
+  'bg-yellow-400',
+  'bg-yellow-400',
+  'bg-yellow-400',
+  'bg-yellow-500',
+  'bg-yellow-500',
+  'bg-yellow-500',
+  'bg-yellow-500',
+  'bg-yellow-500',
+  'bg-orange-400',
+  'bg-orange-400',
+  'bg-orange-400',
+  'bg-orange-500',
+  'bg-orange-500',
+  // 'bg-orange-600',
+  // 'bg-orange-700',
+  // 'bg-orange-800',
+  // 'bg-orange-900',
+];
+
 function getTempColor(temp: number) {
-  if (temp < 80) {
-    return `bg-blue-${Math.min(Math.ceil((80 - temp) / 2) * 100, 900)}`;
-  }
-  if (temp < 90) return 'bg-white'
-  if (temp < 120) {
-    return `bg-yellow-${Math.min(Math.floor((temp - 90) / 2) * 100, 400)}`;
-  }
-  return `bg-orange-${Math.min(Math.floor(temp - 115) * 100, 500)}`;
+
+  const tempIndex = Math.floor((temp - 70) / 2);
+  const index = Math.max(0, Math.min(tempColors.length - 1, tempIndex));
+  const color = tempColors[index];
+  // console.log('temp', temp, tempIndex, color);
+  return color;
+  // if (temp < 80) {
+  //   return `bg-blue-${Math.min(Math.ceil((80 - temp) / 2) * 100, 900)}`;
+  // }
+  // if (temp < 90) return 'bg-white'
+  // if (temp < 120) {
+  //   return `bg-yellow-${Math.min(Math.floor((temp - 90) / 2) * 100, 400)}`;
+  // }
+  // return `bg-orange-${Math.min(Math.floor(temp - 115) * 100, 500)}`;
 }
 const values = computed(() => ({
   temp: props.row[`tireTemp${props.corner}`],
@@ -39,36 +89,6 @@ const needleStyle = computed(() => ({
   width: `${(values.value.combinedSlip * 30).toFixed(1)}px`,
   transformOrigin: '4px center',
 }));
-
-const colors = [
-  'bg-yellow-100',
-  'bg-yellow-200',
-  'bg-yellow-300',
-  'bg-yellow-400',
-  'bg-yellow-500',
-  'bg-yellow-600',
-  'bg-yellow-700',
-  'bg-yellow-800',
-  'bg-yellow-900',
-  'bg-blue-100',
-  'bg-blue-200',
-  'bg-blue-300',
-  'bg-blue-400',
-  'bg-blue-500',
-  'bg-blue-600',
-  'bg-blue-700',
-  'bg-blue-800',
-  'bg-blue-900',
-  'bg-orange-100',
-  'bg-orange-200',
-  'bg-orange-300',
-  'bg-orange-400',
-  'bg-orange-500',
-  'bg-orange-600',
-  'bg-orange-700',
-  'bg-orange-800',
-  'bg-orange-900',
-];
 </script>
 <template>
   <div class="tire" :class="formatted.tempColor">

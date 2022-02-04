@@ -1,4 +1,4 @@
-<script setup lang="ts">import { safeStorage } from 'electron';
+<script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { TelemetryLap } from '../lib';
 
@@ -28,6 +28,8 @@ const markerPos = computed(() => {
   const pos = props.modelValue * ratio;
   return pos;
 });
+
+const playButtonText = computed(() => state.playing ? 'Pause' : 'Play');
 
 function getDelay(index: number) {
   const nextIndex = index + state.speed;
@@ -117,8 +119,8 @@ function onTimelineClick(e: MouseEvent) {
     const width = rect.width;
     const offset = normalizeOffset(timelineRef.value, rect, e.offsetX);
 
-    console.log(rect.toJSON());
-    console.log(timelineRef.value.offsetWidth, timelineRef.value.offsetLeft);
+    // console.log(rect.toJSON());
+    // console.log(timelineRef.value.offsetWidth, timelineRef.value.offsetLeft);
 
     // let offset = e.offsetX;
     // if (offset <= 12) offset = 0;
@@ -133,22 +135,20 @@ const speedOptions = [1, 2, 4, 8, 16, 32];
 </script>
 
 <template>
-  <div class="flex mt-8">
+  <div class="flex mt-8 items-end">
+    <div class="control mx-2">
+      <label>Speed</label>
+      <select v-model="state.speed">
+        <option v-for="value in speedOptions" :key="value" :value="value">{{ value }}x</option>
+      </select>
+    </div>
     <div>
-      <button type="button" @click="onPlayClick" class="mr-8">Play</button>
+      <button type="button" @click="onPlayClick" class="mx-2 w-16">{{ playButtonText }}</button>
     </div>
     <div ref="containerRef" class="timeline cursor-pointer" @click="onTimelineClick">
       <div ref="timelineRef" class="timeline-line">&nbsp;</div>
       <div class="marker" :style="{ left: `${markerPos}px` }"></div>
     </div>
   </div>
-  <div>
-    <div class="control">
-      <label>Speed</label>
-      <select v-model="state.speed">
-        <option v-for="value in speedOptions" :key="value" :value="value">{{ value }}x</option>
-      </select>
-    </div>
-    <p>Delay: {{ state.delay }}</p>
-  </div>
+  <!-- <p>Delay: {{ state.delay }}</p> -->
 </template>
