@@ -238,7 +238,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style lang="postcss">
 .wrapper {
   @apply h-screen
     p-4;

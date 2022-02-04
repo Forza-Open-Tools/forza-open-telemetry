@@ -120,10 +120,19 @@ function round(num: number, precision: number) {
 }
 
 export function formatAsPercent(value: number, precision = 1): string {
-  return `${round(value * 100, precision)}%`;
+  return `${round(value * 100, precision).toFixed(precision)}%`;
 }
 
 export function formatAsTemp(value: number, fahrenheit = false) {
   const temp = fahrenheit ? value * 9 / 5 + 32 : value;
   return `${round(temp, 0)}°${fahrenheit ? 'f' : 'c'}`;
+}
+
+// Convert from radians to degrees.
+export function angleDegree(radians: number): number {
+	return radians * 180 / Math.PI;
+}
+
+export function radians(degrees: number): number {
+	return degrees * Math.PI / 180;
 }

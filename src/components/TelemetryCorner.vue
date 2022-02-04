@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { TelemetryRow } from 'forza-open-telemetry-server';
 import { computed } from 'vue';
+import { CarCorner } from '../lib/types';
 import TelemetrySpring from './TelemetrySpring.vue';
 import TelemetryTire from './TelemetryTire.vue';
 
 const props = defineProps<{
   row: TelemetryRow;
-  corner: 'FrontLeft' | 'FrontRight' | 'RearLeft' | 'RearRight';
+  corner: CarCorner;
 }>();
 
 const name = computed(() => `normalizedSuspensionTravel${props.corner}` as keyof TelemetryRow);
@@ -21,7 +22,7 @@ const spring = computed(() => props.row[name.value]);
   </div>
 </template>
 
-<style>
+<style lang="postcss">
 .corner {
   @apply flex;
 }

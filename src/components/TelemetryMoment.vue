@@ -6,6 +6,7 @@ import TelemetryCorner from './TelemetryCorner.vue';
 import TelemetryMap from './TelemetryMap.vue';
 import TelemetryTimeline from './TelemetryTimeline.vue';
 import Speedometer from './Speedometer.vue';
+import { CarCorner } from '../lib/types';
 
 const props = defineProps<{
   lap: TelemetryLap;
@@ -33,19 +34,19 @@ const telemetry = computed(() => props.lap.telemetry[state.currentIndex]);
   </div>
   <div class="flex w-full mt-8">
     <div class="flex flex-col justify-between">
-      <TelemetryCorner corner="FrontLeft" :row="telemetry" />
-      <TelemetryCorner corner="RearLeft" :row="telemetry" />
+      <TelemetryCorner :corner="CarCorner.frontLeft" :row="telemetry" />
+      <TelemetryCorner :corner="CarCorner.rearLeft" :row="telemetry" />
     </div>
     <div class="w-32">&nbsp;</div>
     <div class="flex flex-col justify-between">
-      <TelemetryCorner corner="FrontRight" :row="telemetry" />
-      <TelemetryCorner corner="RearRight" :row="telemetry" />
+      <TelemetryCorner :corner="CarCorner.frontRight" :row="telemetry" />
+      <TelemetryCorner :corner="CarCorner.rearRight" :row="telemetry" />
     </div>
     <div class="w-[250px] flex flex-col justify-between">
       <slot />
-      <Speedometer :row="telemetry" />
+      <!-- <Speedometer :row="telemetry" /> -->
     </div>
-    <div class="flex-grow flex justify-center">
+    <div class="flex justify-center">
       <TelemetryMap :lap="lap" :current="telemetry" />
     </div>
   </div>
@@ -53,7 +54,7 @@ const telemetry = computed(() => props.lap.telemetry[state.currentIndex]);
   <TelemetryTimeline v-model="state.currentIndex" :lap="lap" />
 </template>
 
-<style>
+<style lang="postcss">
 .side {
   @apply flex;
 }

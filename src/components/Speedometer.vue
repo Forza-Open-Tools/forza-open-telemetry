@@ -62,7 +62,7 @@ const startAngle = computed(() => {
   </div>
 </template>
 
-<style>
+<style lang="postcss">
 .needle {
   @apply absolute
     w-1

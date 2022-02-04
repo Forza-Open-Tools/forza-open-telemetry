@@ -31,6 +31,7 @@
     "chart.js": "^3.7.0",
     "dayjs": "^1.10.7",
     "forza-open-telemetry-server": "file:../forza-open-telemetry-server",
+    "gauge-chart": "^0.5.3",
     "has-hover": "^1.0.1",
     "lodash.debounce": "^4.0.8",
     "socket.io-client": "^4.4.1",

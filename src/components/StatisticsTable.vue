@@ -8,13 +8,6 @@ const props = defineProps<{
   formatter?: (value: number) => string;
 }>();
 
-const names = [
-  'FrontLeft',
-  'FrontRight',
-  'BackLeft',
-  'BackRight',
-];
-
 const valueNames: (keyof Omit<Statistics, 'add'>)[] = ['min', 'max', 'avg'];
 
 const fullNames = computed(() => {
