@@ -1,7 +1,8 @@
 import { TelemetryRow } from 'forza-open-telemetry-server';
 import Statistics from './Statistics';
+import { ILapStatistics } from './types';
 
-export default class LapStatistics {
+export default class LapStatistics implements ILapStatistics {
   normalizedSuspensionTravelFrontLeft = new Statistics();
   normalizedSuspensionTravelFrontRight = new Statistics();
   normalizedSuspensionTravelRearLeft = new Statistics();

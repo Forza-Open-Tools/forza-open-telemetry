@@ -1,12 +1,9 @@
 <script setup lang="ts">import { TelemetryRow } from 'forza-open-telemetry-server';
 import { computed } from 'vue';
-import { Statistics, TelemetryLap } from '../lib';
-import getLapColorClass from '../lib/lapColors';
-import lapColorClasses from '../lib/lapColors';
-import LapTableVue from './LapTable.vue';
+import { ITelemetryLap } from '../lib/types';
 
 const props = defineProps<{
-  lap: TelemetryLap;
+  lap: ITelemetryLap;
   current?: TelemetryRow;
 }>();
 
@@ -57,14 +54,10 @@ const currentPoint = computed(() => props.current ? getPoint(props.current) : nu
 // const startPoint = computed(() => getPoint(props.lap.telemetry[0]));
 const endPoint = computed(() => getPoint(props.lap.telemetry[props.lap.telemetry.length - 1]));
 
-function getDimension(stat: Statistics) {
-  const max = Math.abs(props.lap.stats.positionX.max)
-}
-
 const stroke = computed(() => ({
   width: props.current ? '7px' : '13px',
   opacity: props.current ? '1' : '0.5',
-  class: props.lap.colorClasses.stroke, // props.current ? 'stroke-slate-600' :
+  class: props.lap.colorClasses.stroke,
 }));
 
 const viewBox = computed(() => {
@@ -99,16 +92,4 @@ const viewBox = computed(() => {
       stroke-width="2"
     />
   </svg>
-  <!-- <div>
-    {{ viewBox }}
-    <br />
-    PositionX: {{ lap.stats.positionX }}
-    <br />
-    x size: {{ props.lap.stats.positionX.max - props.lap.stats.positionX.min }}
-    <br />
-    PositionY: {{ lap.stats.positionZ }}
-    <br />
-    y size: {{ props.lap.stats.positionZ.max - props.lap.stats.positionZ.min }}
-    <br />
-  </div>-->
 </template>

@@ -1,7 +1,7 @@
 import { TelemetryRow } from 'forza-open-telemetry-server';
 import getLapColorClass from './lapColors';
 import LapStatistics from './LapStatistics';
-import { CarCorner, LapColorClasses } from './types';
+import { CarCorner, ITelemetryLap, LapColorClasses } from './types';
 
 const corners = [
   CarCorner.frontLeft,
@@ -25,7 +25,7 @@ function getCornerValues(row: TelemetryRow, key: CornerKey): number[] {
   return corners.map((c) => row[`${key}${c}`]);
 }
 
-export default class TelemetryLap {
+export default class TelemetryLap implements ITelemetryLap {
   lap = 0;
   time = 0;
   telemetry: TelemetryRow[] = [];

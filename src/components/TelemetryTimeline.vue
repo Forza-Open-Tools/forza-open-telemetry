@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
-import { TelemetryLap } from '../lib';
+import { ITelemetryLap } from '../lib/types';
 
 const props = defineProps<{
   modelValue: number;
-  lap: TelemetryLap;
+  lap: ITelemetryLap;
 }>();
 
 const emit = defineEmits<{

@@ -6,7 +6,7 @@
 import { computed, defineComponent, PropType } from "vue";
 import { ChartData, ChartDataset, ChartOptions } from 'chart.js';
 import { ScatterChart } from 'vue-chart-3';
-import { TelemetryLap } from '../lib';
+import { ITelemetryLap } from '../lib/types';
 
 const lapColors = [
   'red',
@@ -19,7 +19,7 @@ export default defineComponent({
   components: { ScatterChart },
   props: {
     laps: {
-      type: Object as PropType<TelemetryLap[]>,
+      type: Object as PropType<ITelemetryLap[]>,
       required: true,
     },
   },

@@ -49,7 +49,7 @@ import TravelPath from './TravelPath.vue';
 import Suspension from './Suspension.vue';
 import RawTelemetry from './RawTelemetry.vue';
 import useSocket from './useSocket';
-import { TelemetryDataRow } from '../lib/types';
+import { ITelemetryLap, TelemetryDataRow } from '../lib/types';
 import { TelemetryLap } from '../lib';
 import { convertTelemetryArray } from '../lib/utils';
 import { TelemetryRow } from 'forza-open-telemetry-server';
@@ -60,7 +60,7 @@ import raceData from '../assets/sampleRaceData.json';
 
 interface DashboardState {
   throttle: number;
-  laps: TelemetryLap[];
+  laps: ITelemetryLap[];
   previousLap: TelemetryLap | null;
   currentLap: TelemetryLap | null;
   selectedLapIndex: number;

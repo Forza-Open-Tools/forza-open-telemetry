@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
-import { TelemetryLap } from '../lib';
 import TelemetryCorner from './TelemetryCorner.vue';
 import TelemetryMap from './TelemetryMap.vue';
 import TelemetryTimeline from './TelemetryTimeline.vue';
-import { CarCorner } from '../lib/types';
+import { CarCorner, ITelemetryLap } from '../lib/types';
 import { formatLapTime } from '../lib/utils';
 
 const props = defineProps<{
-  lap: TelemetryLap;
-  laps: TelemetryLap[];
+  lap: ITelemetryLap;
+  laps: ITelemetryLap[];
 }>();
 
 const state = reactive({

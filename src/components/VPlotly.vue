@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div ref="rootRef" :id="id" />
 </template>
 
@@ -199,4 +199,4 @@ export default defineComponent({
     }
   },
 });
-</script>
+</script> -->

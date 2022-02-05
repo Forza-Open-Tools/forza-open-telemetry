@@ -1,11 +1,10 @@
 <script setup lang="ts">import { TelemetryRow } from 'forza-open-telemetry-server';
-import { computed } from 'vue';
-import { TelemetryLap } from '../lib';
+import { ITelemetryLap } from '../lib/types';
 import { formatLapTime } from '../lib/utils';
 
 const props = defineProps<{
   modelValue: number;
-  laps: TelemetryLap[];
+  laps: ITelemetryLap[];
 }>();
 
 const emit = defineEmits<{
