@@ -7,4 +7,8 @@ export default defineConfig({
   server: {
     port: 3333,
   },
+  base: '/forza-open-telemetry/',
+  build: {
+    outDir: 'docs',
+  }
 })
