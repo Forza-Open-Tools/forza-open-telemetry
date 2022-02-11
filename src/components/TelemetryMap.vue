@@ -12,7 +12,7 @@ const svgPadding = 20;
 function getPoint(row: TelemetryRow) {
   return {
     x: Math.floor(row.positionX - props.lap.stats.positionX.min) + svgPadding,
-    y: Math.floor(row.positionZ - props.lap.stats.positionZ.min) + svgPadding,
+    y: Math.floor(props.lap.stats.positionZ.max - props.lap.stats.positionZ.min) - Math.floor(row.positionZ - props.lap.stats.positionZ.min) + svgPadding,
   };
 }
 
