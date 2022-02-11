@@ -4,7 +4,7 @@ import TelemetryCorner from './TelemetryCorner.vue';
 import TelemetryMap from './TelemetryMap.vue';
 import TelemetryTimeline from './TelemetryTimeline.vue';
 import { CarCorner, ITelemetryLap } from '../lib/types';
-import { formatLapTime, formatSpeed, round } from '../lib/utils';
+import { formatLapTime, formatSpeed, calcSpeed, round } from '../lib/utils';
 
 const props = defineProps<{
   lap: ITelemetryLap;
@@ -118,6 +118,18 @@ const overallSpeed = computed(() => {
             </tr>
           </tbody>
         </table>
+
+        <div class="text-3xl font-bold mt-10 flex items-center">
+          <div class="w-28">Speed:</div>
+          <div class="text-right flex-grow">{{ calcSpeed(currentRow.speed).toFixed(1) }}</div>
+          <div class="min-w-[75px] text-right">kph</div>
+        </div>
+
+        <div class="text-3xl font-bold mt-4 flex items-center">
+          <div class="w-28">Tach:</div>
+          <div class="text-right flex-grow">{{ round(currentRow.currentEngineRpm, 0) }}</div>
+          <div class="min-w-[75px] text-right">rpm</div>
+        </div>
       </div>
       <!-- <Speedometer :row="telemetry" /> -->
     </div>

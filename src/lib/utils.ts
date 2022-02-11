@@ -131,7 +131,7 @@ export function calcSpeed(speed: number, toImperial = false): number {
 export function formatSpeed(speed: number, toImperial = false): string {
   const converted = calcSpeed(speed, toImperial);
   const unit = toImperial ? 'mph' : 'kph';
-  return `${converted} ${unit}`;
+  return `${converted.toFixed(1)} ${unit}`;
 }
 
 export function round(num: number, precision: number) {
