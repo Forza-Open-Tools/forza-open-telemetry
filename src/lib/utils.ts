@@ -97,11 +97,17 @@ const headers: Record<number, keyof TelemetryRow> = {
   86: 'normalAiBrakeDifference',
 };
 
+function resolveTelemetryValue(header: keyof TelemetryRow, value: number): number {
+  if (header === 'lap') return value + 1;
+  if (header === 'positionZ') return -value;
+  return value;
+}
+
 export function convertTelemetryArray(dataRow: TelemetryDataRow): TelemetryRow {
   const headerOffset = dataRow.length === 86 ? 1 : 0;
   return dataRow.reduce((acc, value, index) => {
     const header = headers[index + headerOffset];
-    const resolved = header === 'lap' ? (value as number) + 1 : value;
+    const resolved = resolveTelemetryValue(header, value as number);
     return {
       ...acc,
       [header]: resolved,
