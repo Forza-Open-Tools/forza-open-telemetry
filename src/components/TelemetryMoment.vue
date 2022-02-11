@@ -4,7 +4,7 @@ import TelemetryCorner from './TelemetryCorner.vue';
 import TelemetryMap from './TelemetryMap.vue';
 import TelemetryTimeline from './TelemetryTimeline.vue';
 import { CarCorner, ITelemetryLap } from '../lib/types';
-import { formatLapTime } from '../lib/utils';
+import { formatLapTime, formatSpeed, round } from '../lib/utils';
 
 const props = defineProps<{
   lap: ITelemetryLap;
@@ -43,6 +43,21 @@ onBeforeUnmount(() => {
 });
 
 const currentRow = computed(() => props.lap.telemetry[state.currentIndex]);
+
+const averageLapTime = computed(() => props.laps.reduce((total, l) => total + l.time, 0) / props.laps.length);
+
+const overallSpeed = computed(() => {
+  const averages = props.laps.reduce(
+    (total, l) => ({
+      max: Math.max(total.max, l.stats.speed.max),
+      avg: total.avg + l.stats.speed.avg,
+    }),
+    { max: props.lap.stats.speed.max, avg: 0 },
+  );
+  averages.avg /= props.laps.length;
+
+  return averages;
+});
 </script>
 <template>
   <!-- <div>
@@ -67,16 +82,42 @@ const currentRow = computed(() => props.lap.telemetry[state.currentIndex]);
     <div class="w-[300px] mx-4 flex flex-col justify-between">
       <div>
         <slot />
-        <div class="text-xl font-bold">
-          <div class="flex justify-between">
-            <div>Current Lap Time:</div>
-            <div>{{ formatLapTime(currentRow.currentLapTime * 1000) }}</div>
-          </div>
-          <div class="flex justify-between">
-            <div>Current Race Time:</div>
-            <div>{{ formatLapTime(currentRow.currentRaceTime * 1000) }}</div>
-          </div>
-        </div>
+        <table class="font-bold mt-8 text-right">
+          <tbody>
+            <tr>
+              <td>Average Lap Time:</td>
+              <td>{{ formatLapTime(averageLapTime * 1000) }}</td>
+            </tr>
+            <tr>
+              <td>Current Race Time:</td>
+              <td>{{ formatLapTime(currentRow.currentRaceTime * 1000) }}</td>
+            </tr>
+            <tr>
+              <td>Current Lap Time:</td>
+              <td>{{ formatLapTime(currentRow.currentLapTime * 1000) }}</td>
+            </tr>
+            <tr>
+              <td>Top Speed This Lap:</td>
+              <td>{{ formatSpeed(lap.stats.speed.max) }}</td>
+            </tr>
+            <tr>
+              <td>Min Speed This Lap:</td>
+              <td>{{ formatSpeed(lap.stats.speed.min) }}</td>
+            </tr>
+            <tr>
+              <td>Avg Speed This Lap:</td>
+              <td>{{ formatSpeed(lap.stats.speed.avg) }}</td>
+            </tr>
+            <tr>
+              <td>Top Speed Overall:</td>
+              <td>{{ formatSpeed(overallSpeed.max) }}</td>
+            </tr>
+            <tr>
+              <td>Avg Speed Overall:</td>
+              <td>{{ formatSpeed(overallSpeed.avg) }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <!-- <Speedometer :row="telemetry" /> -->
     </div>

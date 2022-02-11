@@ -119,7 +119,22 @@ export function formatLapTime(time: number): string {
   return dayjs(time).format('m:ss.SSS');
 }
 
-function round(num: number, precision: number) {
+const kphConversion = 0.6213711922;
+
+export function calcSpeed(speed: number, toImperial = false): number {
+  const kph = speed * 3.6;
+  const converted = toImperial ? kph * kphConversion : kph;
+
+  return round(converted, 1);
+}
+
+export function formatSpeed(speed: number, toImperial = false): string {
+  const converted = calcSpeed(speed, toImperial);
+  const unit = toImperial ? 'mph' : 'kph';
+  return `${converted} ${unit}`;
+}
+
+export function round(num: number, precision: number) {
   const multiplier = Math.pow(10, precision);
   const m = Number((Math.abs(num) * multiplier).toPrecision(15));
   return Math.round(m) / multiplier * Math.sign(num);
