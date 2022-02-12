@@ -82,7 +82,7 @@ const overallSpeed = computed(() => {
     <div class="w-[300px] mx-4 flex flex-col justify-between">
       <div>
         <slot />
-        <table class="font-bold mt-8 text-right">
+        <!-- <table class="font-bold mt-8 text-right">
           <tbody>
             <tr>
               <td>Average Lap Time:</td>
@@ -129,7 +129,7 @@ const overallSpeed = computed(() => {
           <div class="w-28">Tach:</div>
           <div class="text-right flex-grow">{{ round(currentRow.currentEngineRpm, 0) }}</div>
           <div class="min-w-[75px] text-right">rpm</div>
-        </div>
+        </div> -->
       </div>
       <!-- <Speedometer :row="telemetry" /> -->
     </div>
