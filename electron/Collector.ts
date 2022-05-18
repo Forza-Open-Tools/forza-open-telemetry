@@ -1,5 +1,5 @@
 import * as dgram from 'dgram';
-
+import { AddressInfo } from 'net';
 // const server = dgram.createSocket('udp4');
 
 // server.on('error', (err) => {
@@ -24,6 +24,7 @@ type MessageHandler = (msg: Buffer, rinfo: dgram.RemoteInfo) => void;
 
 class Collector {
   private server = dgram.createSocket('udp4');
+  private address: AddressInfo | null = null;
 
   constructor(private port: number, messageHandler: MessageHandler) {
     this.server.on('error', (err) => {
@@ -33,8 +34,8 @@ class Collector {
     this.server.on('message', messageHandler);
     this.server.on('listening', () => {
       this.running = true;
-      const address = this.server.address();
-      console.log(`Collector listening on ${address.address}:${address.port}`);
+      this.address = this.server.address();
+      console.log(`Collector listening on ${this.address.address}:${this.address.port}`);
     })
     this.server.on('close', () => {
       this.running = false;
@@ -49,9 +50,11 @@ class Collector {
   }
 
   async start() {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<AddressInfo>((resolve, reject) => {
       try {
-        this.server.bind(this.port, resolve);
+        this.server.bind(this.port, () => {
+          resolve(this.server.address());
+        });
       } catch (error) {
         reject(error);
       }
@@ -59,13 +62,27 @@ class Collector {
   }
 
   async stop() {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<boolean>((resolve, reject) => {
       try {
-        this.server.close(resolve);
+        this.server.close(() => {
+          resolve(true);
+        });
       } catch (error) {
         reject(error);
       }
     });
+  }
+
+  async setPort(port: number) {
+    const wasRunning = this.running;
+    if (this.running) {
+      await this.stop();
+    }
+    this.port = port;
+    if (wasRunning) {
+      await this.start();
+    }
+    return true;
   }
 }
 

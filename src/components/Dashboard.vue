@@ -6,8 +6,8 @@
     @dragleave="onDragLeave"
     @drop.prevent="onFileDrop"
   >
-    <!-- <div class="flex items-center p-2 border-b border-gray-700">
-      <label>
+    <div class="flex items-center p-2 border-b border-gray-700">
+      <!-- <label>
         <input type="checkbox" v-model="state.show.travelPath" />
         Show Travel Path
       </label>
@@ -18,14 +18,20 @@
       <label class="ml-8">
         <input type="checkbox" v-model="state.show.telemetryTable" />
         Show Detail Table
-      </label>
-      <button class="ml-8" type="button" @click="onToggleStream">{{ streamingButtonText }} Streaming</button>
-      <div>
+      </label>-->
+      <button
+        class="ml-8"
+        type="button"
+        @click="onToggleCollector"
+      >{{ streamingButtonText }} Collector</button>
+
+      <div v-if="state.connected">Listening on {{ state.address }}:{{ state.port }}</div>
+      <!-- <div>
         <label>Throttle:</label>
         <input type="text" v-model="state.throttle" />
       </div>
-      <div>Tire slip index: {{ state.slipIndex }}</div>
-    </div>-->
+      <div>Tire slip index: {{ state.slipIndex }}</div>-->
+    </div>
     <template v-if="state.laps.length">
       <div class="flex">
         <TravelPath v-if="state.show.travelPath" :laps="state.laps" />
@@ -45,6 +51,8 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, ref } from 'vue'
+import { AddressInfo } from 'net';
+import { TelemetryRow } from 'forza-open-telemetry-server';
 import TravelPath from './TravelPath.vue';
 import Suspension from './Suspension.vue';
 import RawTelemetry from './RawTelemetry.vue';
@@ -52,11 +60,12 @@ import useSocket from './useSocket';
 import { ITelemetryLap, TelemetryDataRow } from '../lib/types';
 import { TelemetryLap } from '../lib';
 import { convertTelemetryArray } from '../lib/utils';
-import { TelemetryRow } from 'forza-open-telemetry-server';
 import StatisticsForLap from './StatisticsForLap.vue';
 import LapTable from './LapTable.vue';
 import TelemetryMoment from './TelemetryMoment.vue';
 import raceData from '../assets/sampleRaceData.json';
+import useIpcClient from '../lib/useIpcClient';
+import useTelemetryJsonParser from '../lib/useTelemetryJsonParser';
 
 interface DashboardState {
   throttle: number;
@@ -65,7 +74,7 @@ interface DashboardState {
   currentLap: TelemetryLap | null;
   selectedLapIndex: number;
   connected: boolean;
-  connectedError: boolean;
+  connectedError: string;
   show: {
     travelPath: boolean;
     suspension: boolean;
@@ -74,6 +83,8 @@ interface DashboardState {
   streaming: boolean;
   wrapperClass: string;
   slipIndex: number;
+  address: string,
+  port: number,
 }
 
 export default defineComponent({
@@ -86,7 +97,7 @@ export default defineComponent({
       currentLap: null,
       selectedLapIndex: 0,
       connected: false,
-      connectedError: false,
+      connectedError: '',
       show: {
         travelPath: false,
         suspension: false,
@@ -95,6 +106,8 @@ export default defineComponent({
       streaming: false,
       wrapperClass: '',
       slipIndex: -1,
+      address: '',
+      port: 0,
     });
 
     const selectedLap = computed<TelemetryLap>(() => state.laps[state.selectedLapIndex] as TelemetryLap);
@@ -140,52 +153,46 @@ export default defineComponent({
       throttleCounter = 0;
     }
 
-    // const socket = io('http://localhost:5555');
-    const socket = useSocket();
+    const ipcClient = useIpcClient({
+      telemetry: (data) => {
+        onTelemetry(data);
+        return Promise.resolve();
+      },
+      collectorClosed: (reason) => {
+        console.log('Collector unexpected closed:', reason);
+        state.connectedError = reason;
+        state.connected = false;
+        return Promise.resolve();
+      },
+    });
 
-    socket.on('telemetry', onTelemetry);
-
-    function onToggleStream() {
-      if (state.streaming) {
-        socket.connect();
-        state.streaming = true;
-      } else {
-        socket.disconnect();
-        state.streaming = false;
+    async function onToggleCollector() {
+      if (state.connected) {
+        const address = await ipcClient.send<AddressInfo>('startCollector');
+        state.address = address.address;
+        state.port = address.port;
       }
     }
 
-    function parseText(text: string) {
-      const lines = text.split(/\r?\n/g);
-      const rows: TelemetryDataRow[] = [];
-      lines.forEach((line, index) => {
-        if (line.trim()) {
-          try {
-            rows.push(JSON.parse(line) as TelemetryDataRow);
-          } catch (error) {
-            console.error('Error parsing line', index);
-            console.log(line);
-          }
-        }
-      });
-      return rows;
-    }
+    // const socket = io('http://localhost:5555');
+    // const socket = useSocket();
 
-    function parseFile(file: File): Promise<TelemetryDataRow[]> {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const result: string = event.target?.result as string || '';
-          const rows = parseText(result);
-          resolve(rows);
-        }
-        reader.readAsText(file);
-      })
-    }
+    // socket.on('telemetry', onTelemetry);
+
+    // function onToggleStream() {
+    //   if (state.streaming) {
+    //     socket.connect();
+    //     state.streaming = true;
+    //   } else {
+    //     socket.disconnect();
+    //     state.streaming = false;
+    //   }
+    // }
+
+    const fileParser = useTelemetryJsonParser();
 
     function parseDataRows(rows: TelemetryDataRow[]) {
       rows.forEach(onTelemetry);
-      state.slipIndex = state.laps[0].telemetry.findIndex((row) => row.tireSlipRatioFrontLeft > 1);
       const totalRows = state.laps.reduce((acc, lap) => acc + lap.telemetry.length, 0);
       console.log('throttle count', throttleCounter);
       console.log('Processed', totalRows);
@@ -200,7 +207,7 @@ export default defineComponent({
         for (let index = 0; index < event.dataTransfer.items.length; index++) {
           const file = event.dataTransfer.items[index].getAsFile();
           if (file) {
-            const rows = await parseFile(file);
+            const rows = await fileParser.parseFile(file);
             console.log('Recieved', rows.length, 'telemetry lines');
             parseDataRows(rows);
           }
@@ -227,9 +234,8 @@ export default defineComponent({
     return {
       state,
       selectedLap,
-      socket: socket.state,
       streamingButtonText,
-      onToggleStream,
+      onToggleCollector,
       onFileDrop,
       onDragOver,
       onDragLeave,
