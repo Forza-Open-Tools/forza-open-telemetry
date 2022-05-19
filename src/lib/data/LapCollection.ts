@@ -1,4 +1,4 @@
-// import { TelemetryRow } from 'forza-open-telemetry-server';
+// import { TelemetryDataArray } from 'forza-open-telemetry-server';
 // import { TelemetryDataRow } from './types';
 // import TelemetryLap from './TelemetryLap';
 
@@ -29,7 +29,7 @@
 //     });
 //   }
 
-//   createLap(row: TelemetryRow) {
+//   createLap(row: TelemetryDataArray) {
 //     const lap = new TelemetryLap(row.lap);
 //     this.laps.push(lap);
 //     this.lastLap = this.currentLap;
@@ -40,11 +40,11 @@
 //     }
 //   }
 
-//   convertTelemetryArray(dataRow: TelemetryDataRow): TelemetryRow {
+//   convertTelemetryArray(dataRow: TelemetryDataRow): TelemetryDataArray {
 //     const headerOffset = dataRow.length === 86 ? 1 : 0;
 //     return dataRow.reduce((acc, value, index) => ({
 //       ...acc,
 //       [headers[index + headerOffset]]: value,
-//     }), { epochMs: 0 } as TelemetryRow);
+//     }), { epochMs: 0 } as TelemetryDataArray);
 //   }
 // }

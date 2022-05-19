@@ -5,22 +5,15 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from "vue";
-import { ChartData, ChartDataset, ChartOptions } from 'chart.js';
+import { ChartData, ChartOptions } from 'chart.js';
 import { LineChart } from 'vue-chart-3';
-
-interface SuspensionData {
-  timestampMS: number;
-  normalizedSuspensionTravelFrontLeft: number;
-  normalizedSuspensionTravelFrontRight: number;
-  normalizedSuspensionTravelRearLeft: number;
-  normalizedSuspensionTravelRearRight: number;
-}
+import { TelemetryDataPoint } from '../lib/data';
 
 export default defineComponent({
   components: { LineChart },
   props: {
     telemetry: {
-      type: Array as PropType<SuspensionData[]>,
+      type: Array as PropType<TelemetryDataPoint[]>,
       required: true,
     },
   },
@@ -43,13 +36,14 @@ export default defineComponent({
       };
 
       props.telemetry.forEach((row) => {
+        const suspension = row.suspensionTravel.normalized;
         front.labels?.push('');
-        front.datasets[0].data.push(row.normalizedSuspensionTravelFrontLeft);
-        front.datasets[1].data.push(row.normalizedSuspensionTravelFrontRight);
+        front.datasets[0].data.push(suspension.front.right);
+        front.datasets[1].data.push(suspension.front.left);
 
         rear.labels?.push('');
-        rear.datasets[0].data.push(row.normalizedSuspensionTravelRearLeft);
-        rear.datasets[1].data.push(row.normalizedSuspensionTravelRearRight);
+        rear.datasets[0].data.push(suspension.rear.right);
+        rear.datasets[1].data.push(suspension.rear.left);
       });
 
       return {

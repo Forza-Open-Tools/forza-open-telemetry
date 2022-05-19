@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import CrossProcessExports from 'electron';
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
-import { ITelemetryLap } from '../lib/types';
+import { TelemetryLap } from '../lib/data';
 
 const props = defineProps<{
   modelValue: number;
-  lap: ITelemetryLap;
+  lap: TelemetryLap;
 }>();
 
 const emit = defineEmits<{
@@ -53,8 +53,8 @@ function getNextFrameIndex() {
   const elapsed = Date.now() - state.playStarted;
   const adjusted = elapsed * state.speed;
   for (let index = props.modelValue + 1; index < props.lap.telemetry.length; index++) {
-    const racetime = props.lap.telemetry[index].currentRaceTime * 1000;
-    const currentRaceTime = currentRow.value.currentRaceTime * 1000;
+    const racetime = props.lap.telemetry[index].raceTime * 1000;
+    const currentRaceTime = currentRow.value.raceTime * 1000;
     // const racetimeDiff = racetime - currentRow.value.currentRaceTime * 1000;
     console.log('index', index, 'racetime', racetime, 'currentRaceTime', currentRaceTime, 'adjusted', adjusted); // 'racetimeDiff', racetimeDiff,
     if (currentRaceTime + adjusted > racetime) {

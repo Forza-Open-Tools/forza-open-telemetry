@@ -1,4 +1,4 @@
-<script setup lang="ts">import { TelemetryRow } from 'forza-open-telemetry-server';
+<script setup lang="ts">import { TelemetryDataArray } from 'forza-open-telemetry-server';
 import { ITelemetryLap } from '../lib/types';
 import { formatLapTime } from '../lib/utils';
 

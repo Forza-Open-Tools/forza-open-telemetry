@@ -1,25 +1,18 @@
 <script setup lang="ts">import { computed } from 'vue';
-import { LapStatistics, Statistics, TelemetryLap } from '../lib';
+import { LapStatistics, Statistics, TelemetryLap } from '../lib/data';
+import { ITelemetryCorners } from '../lib/types';
 
 const props = defineProps<{
-  lap: TelemetryLap;
+  stats: ITelemetryCorners<Statistics>;
   label: string;
-  name: string;
   formatter?: (value: number) => string;
 }>();
 
-const valueNames: (keyof Omit<Statistics, 'add'>)[] = ['min', 'max', 'avg'];
+function defaultFormatter(value: number) {
+  return (Math.round(value * 10000) / 100).toString();
+}
 
-const fullNames = computed(() => {
-  return ['Front', 'Rear'].map((pos) => {
-    return {
-      label: pos,
-      values: ['Left', 'Right'].map((side) => `${props.name}${pos}${side}` as keyof Omit<LapStatistics, 'add'>)
-    };
-  });
-});
-
-const format = computed(() => props.formatter || ((value: number) => (Math.round(value * 10000) / 100).toString()));
+const format = computed(() => props.formatter || defaultFormatter);
 
 </script>
 <template>
@@ -32,6 +25,10 @@ const format = computed(() => props.formatter || ((value: number) => (Math.round
       <th class="border-r border-black" colspan="3">Right</th>
     </tr>
     <tr class="multi-row">
+      <th class="border-r border-black" colspan="3">Front</th>
+      <th class="border-r border-black" colspan="3">Rear</th>
+    </tr>
+    <tr class="multi-row">
       <th>min</th>
       <th>max</th>
       <th class="border-r border-black">avg</th>
@@ -39,14 +36,21 @@ const format = computed(() => props.formatter || ((value: number) => (Math.round
       <th>max</th>
       <th class="border-r border-black">avg</th>
     </tr>
-    <tr v-for="pos in fullNames" :key="pos.label">
-      <template v-for="side in pos.values" :key="side">
-        <td
-          v-for="valueName in valueNames"
-          :key="valueName"
-          :class="{ 'border-r border-black': valueName === 'avg' }"
-        >{{ format(lap.stats[side][valueName]) }}</td>
-      </template>
+    <tr>
+      <td>{{ format(stats.front.left.min) }}</td>
+      <td>{{ format(stats.front.left.min) }}</td>
+      <td class="border-r border-black">{{ format(stats.front.left.avg) }}</td>
+      <td>{{ format(stats.front.right.min) }}</td>f
+      <td>{{ format(stats.front.right.min) }}</td>
+      <td class="border-r border-black">{{ format(stats.front.right.avg) }}</td>
+    </tr>
+    <tr>
+      <td>{{ format(stats.rear.left.min) }}</td>
+      <td>{{ format(stats.rear.left.min) }}</td>
+      <td class="border-r border-black">{{ format(stats.rear.left.avg) }}</td>
+      <td>{{ format(stats.rear.right.min) }}</td>f
+      <td>{{ format(stats.rear.right.min) }}</td>
+      <td class="border-r border-black">{{ format(stats.rear.right.avg) }}</td>
     </tr>
   </table>
 </template>

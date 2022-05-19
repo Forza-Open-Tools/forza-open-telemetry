@@ -1,7 +1,6 @@
-import IpcClient from './IpcClient';
-import { TelemetryIpcClient, TelemetryIpcServer } from './ipc';
+import { TelemetryIpcClient, TelemetryIpcServer, IpcClient } from '../lib/ipc';
 
-export default function useIpcClient(handlers: TelemetryIpcClient) {
+export function useIpcClient(handlers: TelemetryIpcClient) {
   const client = new IpcClient<TelemetryIpcServer, TelemetryIpcClient>(handlers);
 
   client.connect();

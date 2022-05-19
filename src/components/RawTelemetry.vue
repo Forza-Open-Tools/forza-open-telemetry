@@ -60,52 +60,52 @@
         :key="row.timestampMS"
         :class="{
           'border-t border-black': (index % 10) === 0,
-          'bg-yellow-200': index > 0 && row.currentLapTime < lap.telemetry[index - 1].currentLapTime,
+          'bg-yellow-200': index > 0 && row.lapTime < lap.telemetry[index - 1].lapTime,
         }"
       >
         <td>{{ index + 1 }}</td>
         <td>{{ formatLapTime(row.timestampMS - startTs) }}</td>
         <td class="text-center">{{ row.lap }}</td>
-        <td>{{ formatLapTime(row.currentLapTime * 1000) }}</td>
-        <td>{{ formatLapTime(row.currentRaceTime * 1000) }}</td>
+        <td>{{ formatLapTime(row.lapTime * 1000) }}</td>
+        <td>{{ formatLapTime(row.raceTime * 1000) }}</td>
         <td class="text-center">{{ row.racePosition }}</td>
-        <td>{{ Math.round(row.speed * 10) / 10 }}</td>
-        <td>{{ row.gear }}</td>
-        <td>{{ Math.round(row.currentEngineRpm) }}</td>
-        <td class="border-l border-black">{{ Math.round(row.tireTempFrontLeft * 10) / 10 }}</td>
-        <td>{{ Math.round(row.tireTempFrontRight * 10) / 10 }}</td>
-        <td>{{ Math.round(row.tireTempRearLeft * 10) / 10 }}</td>
-        <td>{{ Math.round(row.tireTempRearRight * 10) / 10 }}</td>
+        <td>{{ Math.round(row.engine.speed * 10) / 10 }}</td>
+        <td>{{ row.controls.gear }}</td>
+        <td>{{ Math.round(row.engine.rpm) }}</td>
+        <td class="border-l border-black">{{ Math.round(row.tires.temp.front.left * 10) / 10 }}</td>
+        <td>{{ Math.round(row.tires.temp.front.right * 10) / 10 }}</td>
+        <td>{{ Math.round(row.tires.temp.rear.left * 10) / 10 }}</td>
+        <td>{{ Math.round(row.tires.temp.rear.right * 10) / 10 }}</td>
         <td
           class="border-l border-black"
-        >{{ Math.round(row.suspensionTravelMetersFrontLeft * 10000) / 100 }}</td>
-        <td>{{ Math.round(row.suspensionTravelMetersFrontRight * 10000) / 100 }}</td>
-        <td>{{ Math.round(row.suspensionTravelMetersRearLeft * 10000) / 100 }}</td>
-        <td>{{ Math.round(row.suspensionTravelMetersRearRight * 10000) / 100 }}</td>
+        >{{ Math.round(row.suspensionTravel.meters.front.left * 10000) / 100 }}</td>
+        <td>{{ Math.round(row.suspensionTravel.meters.front.right * 10000) / 100 }}</td>
+        <td>{{ Math.round(row.suspensionTravel.meters.rear.left * 10000) / 100 }}</td>
+        <td>{{ Math.round(row.suspensionTravel.meters.rear.right * 10000) / 100 }}</td>
         <td
           class="border-l border-black"
-        >{{ Math.round(row.normalizedSuspensionTravelFrontLeft * 10000) / 100 }}</td>
-        <td>{{ Math.round(row.normalizedSuspensionTravelFrontRight * 10000) / 100 }}</td>
-        <td>{{ Math.round(row.normalizedSuspensionTravelRearLeft * 10000) / 100 }}</td>
-        <td>{{ Math.round(row.normalizedSuspensionTravelRearRight * 10000) / 100 }}</td>
-        <td class="border-l border-black">{{ Math.round(row.tireSlipRatioFrontLeft * 100) / 100 }}</td>
-        <td>{{ Math.round(row.tireSlipRatioFrontRight * 100) / 100 }}</td>
-        <td>{{ Math.round(row.tireSlipRatioRearLeft * 100) / 100 }}</td>
-        <td>{{ Math.round(row.tireSlipRatioRearRight * 100) / 100 }}</td>
-        <td class="border-l border-black">{{ Math.round(row.tireSlipAngleFrontLeft * 100) / 100 }}</td>
-        <td>{{ Math.round(row.tireSlipAngleFrontRight * 100) / 100 }}</td>
-        <td>{{ Math.round(row.tireSlipAngleRearLeft * 100) / 100 }}</td>
-        <td>{{ Math.round(row.tireSlipAngleRearRight * 100) / 100 }}</td>
+        >{{ Math.round(row.suspensionTravel.normalized.front.left * 10000) / 100 }}</td>
+        <td>{{ Math.round(row.suspensionTravel.normalized.front.right * 10000) / 100 }}</td>
+        <td>{{ Math.round(row.suspensionTravel.normalized.rear.left * 10000) / 100 }}</td>
+        <td>{{ Math.round(row.suspensionTravel.normalized.rear.right * 10000) / 100 }}</td>
+        <td class="border-l border-black">{{ Math.round(row.tires.slipRatio.front.left * 100) / 100 }}</td>
+        <td>{{ Math.round(row.tires.slipRatio.front.right * 100) / 100 }}</td>
+        <td>{{ Math.round(row.tires.slipRatio.rear.left * 100) / 100 }}</td>
+        <td>{{ Math.round(row.tires.slipRatio.rear.right * 100) / 100 }}</td>
+        <td class="border-l border-black">{{ Math.round(row.tires.slipAngle.front.left * 100) / 100 }}</td>
+        <td>{{ Math.round(row.tires.slipAngle.front.right * 100) / 100 }}</td>
+        <td>{{ Math.round(row.tires.slipAngle.rear.left * 100) / 100 }}</td>
+        <td>{{ Math.round(row.tires.slipAngle.rear.right * 100) / 100 }}</td>
         <td
           class="border-l border-black"
-        >{{ Math.round(row.tireCombinedSlipFrontLeft * 100) / 100 }}</td>
-        <td>{{ Math.round(row.tireCombinedSlipFrontRight * 100) / 100 }}</td>
-        <td>{{ Math.round(row.tireCombinedSlipRearLeft * 100) / 100 }}</td>
-        <td>{{ Math.round(row.tireCombinedSlipRearRight * 100) / 100 }}</td>
-        <td class="border-l border-black">{{ row.brake }}</td>
-        <td>{{ row.clutch }}</td>
-        <td>{{ row.handbrake }}</td>
-        <td>{{ row.steer }}</td>
+        >{{ Math.round(row.tires.combinedSlip.front.left * 100) / 100 }}</td>
+        <td>{{ Math.round(row.tires.combinedSlip.front.right * 100) / 100 }}</td>
+        <td>{{ Math.round(row.tires.combinedSlip.rear.left * 100) / 100 }}</td>
+        <td>{{ Math.round(row.tires.combinedSlip.rear.right * 100) / 100 }}</td>
+        <td class="border-l border-black">{{ row.controls.brake }}</td>
+        <td>{{ row.controls.clutch }}</td>
+        <td>{{ row.controls.handbrake }}</td>
+        <td>{{ row.controls.steer }}</td>
         <td>({{ row.epochMs }})</td>
       </tr>
     </tbody>
@@ -115,7 +115,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from "vue";
 import { ScatterChart } from 'vue-chart-3';
-import { TelemetryLap } from '../lib';
+import { TelemetryLap } from '../lib/data';
 import { formatLapTime } from '../lib/utils';
 
 export default defineComponent({

@@ -1,6 +1,15 @@
-import { TelemetryRow } from 'forza-open-telemetry-server';
 
-export type TelemetryDataRow = (boolean | number)[];
+export type TelemetryCornerPrefix =
+  | 'normalizedSuspensionTravel'
+  | 'tireSlipRatio'
+  | 'wheelRotationSpeed'
+  | 'wheelOnRumbleStrip'
+  | 'wheelInPuddleDepth'
+  | 'surfaceRumble'
+  | 'tireSlipAngle'
+  | 'tireCombinedSlip'
+  | 'suspensionTravelMeters'
+  | 'tireTemp';
 
 export interface Rewind {
   lap: number;
@@ -17,7 +26,6 @@ export interface TelemetryIssue {
     x: number;
     y: number;
   };
-
 }
 
 export enum CarCorner {
@@ -27,50 +35,19 @@ export enum CarCorner {
   rearRight = 'RearRight'
 }
 
-export interface IStatistics {
-  min: number;
-  max: number;
-  avg: number;
-  add(value: number): void;
+export interface ITelemetryValuePair<T> {
+  left: T;
+  right: T;
 }
 
-export interface ILapStatistics {
-  normalizedSuspensionTravelFrontLeft: IStatistics;
-  normalizedSuspensionTravelFrontRight: IStatistics;
-  normalizedSuspensionTravelRearLeft: IStatistics;
-  normalizedSuspensionTravelRearRight: IStatistics;
-  tireSlipRatioFrontLeft: IStatistics;
-  tireSlipRatioFrontRight: IStatistics;
-  tireSlipRatioRearLeft: IStatistics;
-  tireSlipRatioRearRight: IStatistics;
-  wheelRotationSpeedFrontLeft: IStatistics;
-  wheelRotationSpeedFrontRight: IStatistics;
-  wheelRotationSpeedRearLeft: IStatistics;
-  wheelRotationSpeedRearRight: IStatistics;
-  tireSlipAngleFrontLeft: IStatistics;
-  tireSlipAngleFrontRight: IStatistics;
-  tireSlipAngleRearLeft: IStatistics;
-  tireSlipAngleRearRight: IStatistics;
-  tireCombinedSlipFrontLeft: IStatistics;
-  tireCombinedSlipFrontRight: IStatistics;
-  tireCombinedSlipRearLeft: IStatistics;
-  tireCombinedSlipRearRight: IStatistics;
-  tireTempFrontLeft: IStatistics;
-  tireTempFrontRight: IStatistics;
-  tireTempRearLeft: IStatistics;
-  tireTempRearRight: IStatistics;
-  speed: IStatistics;
-  positionX: IStatistics;
-  positionZ: IStatistics;
-  add(row: TelemetryRow): void;
+export interface ITelemetryCorners<T> {
+  front: ITelemetryValuePair<T>;
+  rear: ITelemetryValuePair<T>;
+  getCornerValue(corner: CarCorner): T;
 }
 
-export interface ITelemetryLap {
-  lap: number;
-  time: number;
-  telemetry: TelemetryRow[];
-  issues: TelemetryRow[];
-  stats: ILapStatistics;
-  colorClasses: LapColorClasses;
-  add(row: TelemetryRow): void;
+export interface IDimensionalValue<T> {
+  x: T;
+  y: T;
+  z: T;
 }

@@ -1,11 +1,11 @@
 import { ipcMain } from 'electron';
 import { v4 as uuid } from 'uuid';
-import { NodeIPC } from 'node-ipc';
-import { IpcMessage, IpcMessageHandlers, IpcMessageType } from './ipc';
+import ipc from 'node-ipc';
+import { IpcMessage, IpcMessageHandlers, IpcMessageType, NodeIpcClient } from './types';
 
 declare global {
   interface Window {
-    ipcConnect(): Promise<NodeIPC.Client>;
+    ipcConnect(): Promise<NodeIpcClient>;
   }
 }
 
@@ -14,9 +14,9 @@ interface ReplyHandler {
   reject(error: any): void;
 }
 
-export default class IpcClient<S extends IpcMessageHandlers, C extends IpcMessageHandlers> {
+export class IpcClient<S extends IpcMessageHandlers, C extends IpcMessageHandlers> {
   private queue: string[] = [];
-  private client: NodeIPC.Client | null = null;
+  private client: NodeIpcClient | null = null;
 
   constructor(private handlers: C) {
 

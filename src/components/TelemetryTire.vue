@@ -1,10 +1,12 @@
-<script setup lang="ts">import { TelemetryRow } from 'forza-open-telemetry-server';
+<script setup lang="ts">
 import { computed } from 'vue';
+import { TelemetryDataPoint } from '../lib/data';
+import { TelemetryCorner } from '../lib/data/TelemetryCorner';
 import { CarCorner } from '../lib/types';
 import { angleDegree, formatAsTemp } from '../lib/utils';
 
 const props = defineProps<{
-  row: TelemetryRow;
+  data: TelemetryDataPoint;
   corner: CarCorner;
 }>();
 
@@ -53,7 +55,6 @@ const tempColors = [
 ];
 
 function getTempColor(temp: number) {
-
   const tempIndex = Math.floor((temp - 70) / 2);
   const index = Math.max(0, Math.min(tempColors.length - 1, tempIndex));
   const color = tempColors[index];
@@ -68,11 +69,12 @@ function getTempColor(temp: number) {
   // }
   // return `bg-orange-${Math.min(Math.floor(temp - 115) * 100, 500)}`;
 }
+
 const values = computed(() => ({
-  temp: props.row[`tireTemp${props.corner}`],
-  combinedSlip: props.row[`tireCombinedSlip${props.corner}`],
-  slipRatio: props.row[`tireSlipRatio${props.corner}`],
-  slipAngle: angleDegree(props.row[`tireSlipAngle${props.corner}`]),
+  temp: props.data.tires.temp.getCornerValue(props.corner),
+  combinedSlip: props.data.tires.combinedSlip.getCornerValue(props.corner),
+  slipRatio: props.data.tires.slipRatio.getCornerValue(props.corner),
+  slipAngle: angleDegree(props.data.tires.slipAngle.getCornerValue(props.corner)),
 }));
 
 const formatted = computed(() => ({

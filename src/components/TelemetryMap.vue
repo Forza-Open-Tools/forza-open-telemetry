@@ -1,22 +1,23 @@
-<script setup lang="ts">import { TelemetryRow } from 'forza-open-telemetry-server';
+<script setup lang="ts">
 import { computed } from 'vue';
-import { ITelemetryLap } from '../lib/types';
+import { getLapColorClass } from '../lib';
+import { TelemetryDataPoint, TelemetryLap } from '../lib/data';
 
 const props = defineProps<{
-  lap: ITelemetryLap;
-  current?: TelemetryRow;
+  lap: TelemetryLap;
+  current?: TelemetryDataPoint;
 }>();
 
 const svgPadding = 20;
 
-function getPoint(row: TelemetryRow) {
+function getPoint(row: TelemetryDataPoint) {
   return {
-    x: Math.floor(row.positionX - props.lap.stats.positionX.min) + svgPadding,
-    y: Math.floor(row.positionZ - props.lap.stats.positionZ.min) + svgPadding,
+    x: Math.floor(row.position.x - props.lap.stats.position.x.min) + svgPadding,
+    y: Math.floor(row.position.z - props.lap.stats.position.z.min) + svgPadding,
   };
 }
 
-function getCommand(row: TelemetryRow, command = 'L') {
+function getCommand(row: TelemetryDataPoint, command = 'L') {
   const point = getPoint(row);
   return `${command} ${point.x},${point.y}`;
 }
@@ -54,18 +55,20 @@ const currentPoint = computed(() => props.current ? getPoint(props.current) : nu
 // const startPoint = computed(() => getPoint(props.lap.telemetry[0]));
 const endPoint = computed(() => getPoint(props.lap.telemetry[props.lap.telemetry.length - 1]));
 
+const colorClass = computed(() => getLapColorClass(props.lap.lap));
+
 const stroke = computed(() => ({
   width: props.current ? '7px' : '13px',
   opacity: props.current ? '1' : '0.5',
-  class: props.lap.colorClasses.stroke,
+  class:  colorClass.value.stroke,
 }));
 
 const viewBox = computed(() => {
   return [
     0,
     0,
-    Math.floor(Math.abs(props.lap.stats.positionX.max - props.lap.stats.positionX.min) + svgPadding * 2),
-    Math.ceil(Math.abs(props.lap.stats.positionZ.max - props.lap.stats.positionZ.min) + svgPadding * 2),
+    Math.floor(Math.abs(props.lap.stats.position.x.max - props.lap.stats.position.x.min) + svgPadding * 2),
+    Math.ceil(Math.abs(props.lap.stats.position.z.max - props.lap.stats.position.z.min) + svgPadding * 2),
   ].join(' ');
 });
 

@@ -3,12 +3,13 @@ import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import TelemetryCorner from './TelemetryCorner.vue';
 import TelemetryMap from './TelemetryMap.vue';
 import TelemetryTimeline from './TelemetryTimeline.vue';
-import { CarCorner, ITelemetryLap } from '../lib/types';
+import { CarCorner } from '../lib/types';
 import { formatLapTime, formatSpeed, calcSpeed, round } from '../lib/utils';
+import { TelemetryLap } from '../lib/data';
 
 const props = defineProps<{
-  lap: ITelemetryLap;
-  laps: ITelemetryLap[];
+  lap: TelemetryLap;
+  laps: TelemetryLap[];
 }>();
 
 const state = reactive({
@@ -47,13 +48,12 @@ const currentRow = computed(() => props.lap.telemetry[state.currentIndex]);
 const averageLapTime = computed(() => props.laps.reduce((total, l) => total + l.time, 0) / props.laps.length);
 
 const overallSpeed = computed(() => {
-  const averages = props.laps.reduce(
-    (total, l) => ({
-      max: Math.max(total.max, l.stats.speed.max),
-      avg: total.avg + l.stats.speed.avg,
-    }),
-    { max: props.lap.stats.speed.max, avg: 0 },
-  );
+  const averages = { max: props.lap.stats.speed.max, avg: 0 };
+
+  props.laps.forEach((lap) => {
+    averages.max = Math.max(averages.max, lap.stats.speed.max);
+    averages.avg = averages.avg + lap.stats.speed.avg;
+  });
   averages.avg /= props.laps.length;
 
   return averages;
@@ -71,13 +71,13 @@ const overallSpeed = computed(() => {
   </div>-->
   <div class="flex w-full mt-8">
     <div class="flex flex-col justify-between">
-      <TelemetryCorner :corner="CarCorner.frontLeft" :row="currentRow" />
-      <TelemetryCorner :corner="CarCorner.rearLeft" :row="currentRow" />
+      <TelemetryCorner :corner="CarCorner.frontLeft" :data="currentRow" />
+      <TelemetryCorner :corner="CarCorner.rearLeft" :data="currentRow" />
     </div>
     <div class="w-32">&nbsp;</div>
     <div class="flex flex-col justify-between">
-      <TelemetryCorner :corner="CarCorner.frontRight" :row="currentRow" />
-      <TelemetryCorner :corner="CarCorner.rearRight" :row="currentRow" />
+      <TelemetryCorner :corner="CarCorner.frontRight" :data="currentRow" />
+      <TelemetryCorner :corner="CarCorner.rearRight" :data="currentRow" />
     </div>
     <div class="w-[300px] mx-4 flex flex-col justify-between">
       <div>

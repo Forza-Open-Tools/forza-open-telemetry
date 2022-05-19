@@ -1,6 +1,6 @@
-import { IStatistics } from './types';
 
-export default class Statistics implements IStatistics {
+
+export class Statistics {
   min = 0;
   max = 0;
   private _avg = 0;

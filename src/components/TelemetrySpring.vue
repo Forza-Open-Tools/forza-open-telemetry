@@ -1,16 +1,20 @@
 <script setup lang="ts">
-import { TelemetryRow } from 'forza-open-telemetry-server';
 import { computed } from 'vue';
+import { TelemetryDataPoint } from '../lib/data';
 import { CarCorner } from '../lib/types';
 import { formatAsPercent } from '../lib/utils';
 
 const props = defineProps<{
-  row: TelemetryRow;
+  data: TelemetryDataPoint;
   corner: CarCorner;
 }>();
 
-const name = computed(() => `normalizedSuspensionTravel${props.corner}` as keyof TelemetryRow);
-const level = computed(() => props.row[name.value]);
+const level = computed(() => {
+  if (props.corner === CarCorner.frontLeft) return props.data.suspensionTravel.normalized.front.left;
+  if (props.corner === CarCorner.frontRight) return props.data.suspensionTravel.normalized.front.right;
+  if (props.corner === CarCorner.rearLeft) return props.data.suspensionTravel.normalized.rear.left;
+  return props.data.suspensionTravel.normalized.rear.right;
+});
 
 function getColor(value: number) {
   const percent = value * 100;

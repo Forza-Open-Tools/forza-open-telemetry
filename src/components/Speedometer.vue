@@ -1,8 +1,11 @@
-<script setup lang="ts">import { TelemetryRow } from 'forza-open-telemetry-server';
+<script setup lang="ts">import { TelemetryDataArray } from 'forza-open-telemetry-server';
 import { computed, reactive } from 'vue';
+import { TelemetryDataPoint } from '../lib/data';
+import { RaceCar } from '../lib/data/RaceCar';
 
 const props = defineProps<{
-  row: TelemetryRow;
+  car: RaceCar;
+  row: TelemetryDataPoint;
 }>();
 
 const circle = reactive({
@@ -18,7 +21,7 @@ const viewBox = computed(() => [
   circle.radius * 2 + 2 - 30,
 ]);
 
-const maxRpm = computed(() => Math.round(props.row.engineMaxRpm));
+const maxRpm = computed(() => Math.round(props.car.maxRpm));
 
 const ticks = computed(() => {
   const marks = [];
@@ -49,10 +52,10 @@ const startAngle = computed(() => {
 </script>
 <template>
   <div class="relative">
-    <div>{{ Math.round(row.engineMaxRpm) }}</div>
+    <div>{{ maxRpm }}</div>
     <div>Start Angle: {{ startAngle }}</div>
-    <div>Speed: {{ Math.round(row.speed) }} kph</div>
-    <div>RPMs: {{ Math.round(row.currentEngineRpm) }}</div>
+    <div>Speed: {{ Math.round(row.engine.speed) }} kph</div>
+    <div>RPMs: {{ Math.round(row.engine.rpm) }}</div>
     <div class="relative">
       <svg viewBox="0 0 100 70" class="bg-transparent w-full border-black border">
         <circle cx="50" cy="50" r="48" stroke="black" fill="transparent" />

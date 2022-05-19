@@ -33,7 +33,7 @@ const lapColorClasses = {
 
 // console.log(JSON.stringify(lapColorClasses));
 
-export default function getLapColorClass(lapNumber: number): LapColorClasses {
+export function getLapColorClass(lapNumber: number): LapColorClasses {
   const index = (lapNumber - 1) % lapColorClasses.stroke.length;
   return {
     bg: lapColorClasses.bg[index],
