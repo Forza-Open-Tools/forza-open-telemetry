@@ -1,7 +1,7 @@
-import { TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
+import { ICarControls } from '../types';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
 
-
-export class CarControls {
+export class CarControls implements ICarControls {
   accelerator: number;
   brake: number;
   clutch: number;

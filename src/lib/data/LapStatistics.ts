@@ -2,8 +2,9 @@ import { CarCornerStatistics } from './CarCornerStatistics';
 import { DimensionalStatistics } from './DimensionalStatistics';
 import { Statistics } from './Statistics';
 import { TelemetryDataPoint } from './TelemetryDataPoint';
+import { ILapStatistics } from '../types';
 
-export class LapStatistics {
+export class LapStatistics implements ILapStatistics {
   normalizedSuspensionTravel = new CarCornerStatistics('normalizedSuspensionTravel');
   tireTemp = new CarCornerStatistics('tireTemp');
   speed = new Statistics();

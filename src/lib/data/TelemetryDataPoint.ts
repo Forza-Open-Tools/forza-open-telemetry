@@ -1,5 +1,5 @@
-import { TelemetryDataArray, TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
-import { IDimensionalValue } from '../types';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { IDimensionalValue, ITelemetryDataPoint } from '../types';
 import { CarControls } from './CarControls';
 import { CarEngine } from './CarEngine';
 import { CarMovement } from './CarMovement';
@@ -8,7 +8,7 @@ import { SuspensionTravel } from './SuspensionTravel';
 import { TiresData } from './TiresData';
 import { WheelsData } from './WheelsData';
 
-export class TelemetryDataPoint {
+export class TelemetryDataPoint implements ITelemetryDataPoint {
   epochMs: number;
   timestampMS: number;
   lapTime: number;

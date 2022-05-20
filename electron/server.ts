@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import { Parser, Publisher } from 'forza-open-telemetry-server';
+import { Parser } from 'forza-open-telemetry-server';
 import { TelemetryIpcServer, TelemetryIpcClient } from '../src/lib/ipc';
 import IpcServer from './IpcServer';
 import Collector from './Collector';

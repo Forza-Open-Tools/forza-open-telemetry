@@ -1,7 +1,8 @@
-import { TelemetryDataArray, TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
+import { TelemetryDataArray } from 'forza-open-telemetry-server';
 import { AddressInfo } from 'net';
 import { reactive, readonly } from 'vue';
 import { Race } from '../lib/data/Race';
+import { TelemetryDataArrayWrapper } from '../lib/data/TelemetryDataArrayWrapper';
 import { useIpcClient } from './useIpcClient';
 
 const state = reactive({

@@ -1,4 +1,4 @@
-import ipc, { NodeIPC } from 'node-ipc';
+import ipc from 'node-ipc';
 import { Socket } from 'net';
 import { IpcMessageHandlers, IpcMessage, IpcMessageType } from '../src/lib/ipc';
 
@@ -26,7 +26,7 @@ export default class IpcServer<S extends IpcMessageHandlers, C extends IpcMessag
         }
       })
     });
-    const server = new NodeIPC.IPC();
+    const server = new ipc.IPC();
     server.config.id
     ipc.serve()
   }
@@ -45,6 +45,6 @@ export default class IpcServer<S extends IpcMessageHandlers, C extends IpcMessag
       name,
       payload,
     };
-    ipc.server.broadcast('message', )
+    ipc.server.broadcast('message',)
   }
 }

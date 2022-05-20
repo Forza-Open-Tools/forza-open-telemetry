@@ -6,8 +6,11 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     port: 3333,
+    fs: {
+      allow: ['..'],
+    }
   },
-  base: '/forza-open-telemetry/',
+  // base: '/forza-open-telemetry/',
   build: {
     outDir: 'docs',
   }

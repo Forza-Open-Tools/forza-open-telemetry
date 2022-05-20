@@ -1,4 +1,5 @@
-import { TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { IRaceCar } from '../types';
 
 const carClassLookup: Record<number, string> = {
   1: 'D',
@@ -10,7 +11,7 @@ const carClassLookup: Record<number, string> = {
   7: 'X',
 };
 
-export class RaceCar {
+export class RaceCar implements IRaceCar {
   ordinal: number;
   carClassId: number;
   carClass: string;

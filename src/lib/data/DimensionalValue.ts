@@ -1,4 +1,5 @@
-import { TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { IDimensionalValue } from '../types';
 
 type DimensionalPrefix =
   | 'acceleration'
@@ -6,7 +7,7 @@ type DimensionalPrefix =
   | 'angularVelocity'
   | 'position';
 
-export class DimensionalValue {
+export class DimensionalValue implements IDimensionalValue<number> {
   x: number;
   y: number;
   z: number;

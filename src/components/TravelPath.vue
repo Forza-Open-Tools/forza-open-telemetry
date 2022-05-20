@@ -1,79 +1,57 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { ChartData, ChartDataset, ChartOptions } from 'chart.js';
+import { ScatterChart } from 'vue-chart-3';
+import { useRaceStore } from '../store';
+
+const store = useRaceStore();
+
+const data = computed<ChartData<'scatter'>>(() => {
+  const datasets = store.selectedRace!.laps.map<ChartDataset<'scatter'>>((lap) => ({
+    data: lap.telemetry.map((row) => ({
+      x: row.position.x,
+      y: row.position.z,
+
+    })),
+    showLine: true,
+    label: `Lap ${lap.lap + 1}`,
+    borderColor: store.lapColorClasses[lap.lap].bg,
+    backgroundColor: store.lapColorClasses[lap.lap].bg,
+  }));
+
+  datasets.unshift({
+    data: [{ ...(datasets[0].data as { x: number, y: number }[])[0] }],
+    label: 'Start Point',
+    pointBackgroundColor: 'black',
+    pointRadius: 10,
+    pointBorderColor: 'black',
+  });
+
+  return {
+    datasets
+  };
+});
+
+const options: ChartOptions = {
+  elements: {
+    line: {
+      borderWidth: 2,
+      borderCapStyle: 'round',
+      tension: 0.05,
+
+    },
+    point: {
+      backgroundColor: 'none',
+      borderColor: 'none',
+      radius: 0,
+    }
+  },
+}
+</script>
+
 <template>
   <ScatterChart :chart-data="data" :options="options" class="square-chart" />
 </template>
-
-<script lang="ts">
-import { computed, defineComponent, PropType } from "vue";
-import { ChartData, ChartDataset, ChartOptions } from 'chart.js';
-import { ScatterChart } from 'vue-chart-3';
-import { TelemetryLap } from '../lib/data';
-
-const lapColors = [
-  'red',
-  'blue',
-  'green',
-  'yellow',
-];
-
-export default defineComponent({
-  components: { ScatterChart },
-  props: {
-    laps: {
-      type: Object as PropType<TelemetryLap[]>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const data = computed<ChartData<'scatter'>>(() => {
-      const datasets = props.laps.map<ChartDataset<'scatter'>>((lap) => ({
-        data: lap.telemetry.map((row) => ({
-          x: row.position.x,
-          y: row.position.z,
-
-        })),
-        showLine: true,
-        label: `Lap ${lap.lap + 1}`,
-        borderColor: lapColors[lap.lap],
-        backgroundColor: lapColors[lap.lap],
-      }));
-
-      datasets.unshift({
-        data: [{ ...(datasets[0].data as { x: number, y: number }[])[0] }],
-        label: 'Start Point',
-        pointBackgroundColor: 'black',
-        pointRadius: 10,
-        pointBorderColor: 'black',
-      });
-
-      return {
-        datasets
-      };
-    });
-
-    const options: ChartOptions = {
-      elements: {
-        line: {
-          borderWidth: 2,
-          borderCapStyle: 'round',
-          tension: 0.05,
-
-        },
-        point: {
-          backgroundColor: 'none',
-          borderColor: 'none',
-          radius: 0,
-        }
-      },
-
-    }
-
-    return {
-      data,
-      options,
-    }
-  },
-})
-</script>
 
 <style>
 .square-chart {

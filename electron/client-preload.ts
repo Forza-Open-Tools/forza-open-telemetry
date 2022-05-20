@@ -1,10 +1,11 @@
 import { ipcRenderer } from 'electron';
 import isDev from 'electron-is-dev';
-import ipc, { NodeIPC } from 'node-ipc';
+import ipc from 'node-ipc';
+import { NodeIpcClient } from '../src/lib/ipc';
 
 declare global {
   interface Window {
-    ipcConnect(name: string): Promise<NodeIPC.Client>;
+    ipcConnect(name: string): Promise<NodeIpcClient>;
   }
 }
 
@@ -27,7 +28,7 @@ const socketPromise = new Promise<string>((resolve) => {
   });
 });
 
-function ipcConnect(): Promise<NodeIPC.Client> {
+function ipcConnect(): Promise<NodeIpcClient> {
   return socketPromise.then((name) => {
     return new Promise((resolve) => {
       ipc.config.silent = true;

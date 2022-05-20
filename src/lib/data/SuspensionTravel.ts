@@ -1,8 +1,8 @@
-import { TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
-import { ITelemetryCorners } from '../types';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { ISuspensionTravel, ITelemetryCorners } from '../types';
 import { TelemetryCorner } from './TelemetryCorner';
 
-export class SuspensionTravel {
+export class SuspensionTravel implements ISuspensionTravel {
   normalized: ITelemetryCorners<number>;
   meters: ITelemetryCorners<number>;
 

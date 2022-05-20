@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { TelemetryDataPoint } from '../lib/data';
-import { TelemetryCorner } from '../lib/data/TelemetryCorner';
-import { CarCorner } from '../lib/types';
+import { CarCorner, ITelemetryDataPoint } from '../lib/types';
 import { angleDegree, formatAsTemp } from '../lib/utils';
 
 const props = defineProps<{
-  data: TelemetryDataPoint;
+  data: ITelemetryDataPoint;
   corner: CarCorner;
 }>();
 
@@ -114,49 +112,21 @@ const needleStyle = computed(() => ({
 
 <style>
 .tire {
-  @apply w-[100px]
-    h-[175px]
-    border-4
-    border-gray-600
-    rounded-3xl
-    flex
-    flex-col
-    justify-center
-    items-center;
+  @apply w-[100px] h-[175px] border-4 border-gray-600 rounded-3xl flex flex-col justify-center items-center;
 }
 
 .tire-slip {
-  @apply relative
-    rounded-full
-    w-[60px]
-    h-[60px]
-    /* outline-8
+  @apply relative rounded-full w-[60px] h-[60px]
+  /* outline-8
     outline-gray-600 */
-    border-8
-    border-gray-600
-    text-center
-    text-sm;
+  border-8 border-gray-600 text-center text-sm;
 }
 
 .tire-slip-center {
-  @apply w-2
-    h-2
-    bg-yellow-400
-    rounded-full
-    absolute
-    left-[18px]
-    top-[18px];
+  @apply w-2 h-2 bg-yellow-400 rounded-full absolute left-[18px] top-[18px];
 }
 
 .tire-slip-needle {
-  @apply absolute
-    h-2
-    min-w-[8px]
-    bg-black
-    left-[18px]
-    top-[18px]
-    rounded-full
-    border-gray-600
-    border;
+  @apply absolute h-2 min-w-[8px] bg-black left-[18px] top-[18px] rounded-full border-gray-600 border;
 }
 </style>

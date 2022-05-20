@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { TelemetryDataArray } from 'forza-open-telemetry-server';
-import { computed } from 'vue';
-import { TelemetryDataPoint } from '../lib/data';
-import { CarCorner } from '../lib/types';
+import { CarCorner, ITelemetryDataPoint } from '../lib/types';
 import TelemetrySpring from './TelemetrySpring.vue';
 import TelemetryTire from './TelemetryTire.vue';
 
 const props = defineProps<{
-  data: TelemetryDataPoint;
+  data: ITelemetryDataPoint;
   corner: CarCorner;
 }>();
 
@@ -19,7 +16,7 @@ const props = defineProps<{
   </div>
 </template>
 
-<style lang="postcss">
+<style>
 .corner {
   @apply flex;
 }
@@ -28,7 +25,7 @@ const props = defineProps<{
   @apply mr-4;
 } */
 
-.corner + .corner {
+.corner+.corner {
   @apply mt-8;
 }
 

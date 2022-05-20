@@ -1,20 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { TelemetryDataPoint } from '../lib/data';
-import { CarCorner } from '../lib/types';
+import { CarCorner, ITelemetryDataPoint } from '../lib/types';
 import { formatAsPercent } from '../lib/utils';
 
 const props = defineProps<{
-  data: TelemetryDataPoint;
+  data: ITelemetryDataPoint;
   corner: CarCorner;
 }>();
 
-const level = computed(() => {
-  if (props.corner === CarCorner.frontLeft) return props.data.suspensionTravel.normalized.front.left;
-  if (props.corner === CarCorner.frontRight) return props.data.suspensionTravel.normalized.front.right;
-  if (props.corner === CarCorner.rearLeft) return props.data.suspensionTravel.normalized.rear.left;
-  return props.data.suspensionTravel.normalized.rear.right;
-});
+const level = computed(() => props.data.suspensionTravel.normalized.getCornerValue(props.corner));
 
 function getColor(value: number) {
   const percent = value * 100;
@@ -37,27 +31,14 @@ const spring = computed(() => ({
 
 <style>
 .spring {
-  @apply w-[20px]
-    h-[175px]
-    border
-    border-black
-    relative
-    mx-4;
+  @apply w-[20px] h-[175px] border border-black relative mx-4;
 }
 
 .spring-label {
-  @apply text-sm
-    h-[175px]
-    w-10
-    flex
-    items-center;
+  @apply text-sm h-[175px] w-10 flex items-center;
 }
 
 .spring-level {
-  @apply absolute
-    bottom-0
-    left-0
-    w-full
-    bg-red-700;
+  @apply absolute bottom-0 left-0 w-full bg-red-700;
 }
 </style>

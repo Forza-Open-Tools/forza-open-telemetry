@@ -1,6 +1,7 @@
-import { TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { ICarEngine } from '../types';
 
-export class CarEngine {
+export class CarEngine implements ICarEngine {
   rpm: number;
   speed: number;
   power: number;

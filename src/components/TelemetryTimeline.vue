@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import CrossProcessExports from 'electron';
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
-import { TelemetryLap } from '../lib/data';
-
-const props = defineProps<{
-  modelValue: number;
-  lap: TelemetryLap;
-}>();
+import { ITelemetryLap } from '../lib/types';
+import { useRaceStore } from '../store';
 
 const emit = defineEmits<{
   (e: 'update:modelValue', v: number): void,
 }>();
+
+const store = useRaceStore();
+
+const lap = computed(() => store.selectedLap!);
+const currentRow = computed(() => store.currentDataPoint!);
+const currentIndex = computed(() => store.currentDataPointIndex);
 
 const state = reactive({
   playing: false,
@@ -26,22 +27,21 @@ const timelineRef = ref<HTMLElement>();
 const markerPos = computed(() => {
   if (!timelineRef.value) return 0;
   const width = timelineRef.value.getBoundingClientRect().width;
-  const ratio = width / props.lap.telemetry.length;
-  const pos = props.modelValue * ratio;
+  const ratio = width / lap.value.telemetry.length;
+  const pos = currentIndex.value * ratio;
   return pos;
 });
 
 const playButtonText = computed(() => state.playing ? 'Pause' : 'Play');
 
-const currentRow = computed(() => props.lap.telemetry[Math.min(props.lap.telemetry.length - 1, props.modelValue)]);
 // function getDelay(index: number) {
 //   const curIndex = Math.max(state.lastIndex, index);
 //   const nextIndex = Math.floor(curIndex + state.speed);
 //   state.lastIndex = nextIndex;
-//   console.log('getDelay index', index, 'nextIndex', nextIndex, 'length', props.lap.telemetry.length);
-//   if (nextIndex > index && nextIndex < props.lap.telemetry.length) {
-//     const currentTime = props.lap.telemetry[props.modelValue].currentRaceTime;
-//     const nextTime = props.lap.telemetry[nextIndex].currentRaceTime;
+//   console.log('getDelay index', index, 'nextIndex', nextIndex, 'length', lap.value.telemetry.length);
+//   if (nextIndex > index && nextIndex < lap.value.telemetry.length) {
+//     const currentTime = lap.value.telemetry[currentIndex.value].currentRaceTime;
+//     const nextTime = lap.value.telemetry[nextIndex].currentRaceTime;
 //     const difference = (nextTime - currentTime) * 1000;
 //     console.log('difference', difference, 'delay', delay);
 //     return delay;
@@ -52,8 +52,8 @@ const currentRow = computed(() => props.lap.telemetry[Math.min(props.lap.telemet
 function getNextFrameIndex() {
   const elapsed = Date.now() - state.playStarted;
   const adjusted = elapsed * state.speed;
-  for (let index = props.modelValue + 1; index < props.lap.telemetry.length; index++) {
-    const racetime = props.lap.telemetry[index].raceTime * 1000;
+  for (let index = currentIndex.value + 1; index < lap.value.telemetry.length; index++) {
+    const racetime = lap.value.telemetry[index].raceTime * 1000;
     const currentRaceTime = currentRow.value.raceTime * 1000;
     // const racetimeDiff = racetime - currentRow.value.currentRaceTime * 1000;
     console.log('index', index, 'racetime', racetime, 'currentRaceTime', currentRaceTime, 'adjusted', adjusted); // 'racetimeDiff', racetimeDiff,
@@ -68,10 +68,10 @@ function getNextFrameIndex() {
   return -1;
 }
 
-// state.delay = getDelay(props.modelValue);
+// state.delay = getDelay(currentIndex.value);
 
 function callback() {
-  // const nextDelay = getDelay(props.modelValue);
+  // const nextDelay = getDelay(currentIndex.value);
   // state.delay = nextDelay;
   const index = getNextFrameIndex();
   console.log('callback index', index);
@@ -84,15 +84,15 @@ function callback() {
   //   window.setTimeout(() => {
   //     getNextFrameIndex()
   //     if ()
-  //     emit('update:modelValue', props.modelValue + 1);
+  //     emit('update:modelValue', currentIndex.value + 1);
   //   }, nextDelay);
   // } else {
-  //   emit('update:modelValue', props.lap.telemetry.length - 1);
+  //   emit('update:modelValue', lap.value.telemetry.length - 1);
   //   state.playing = false;
   // }
-  // const index = props.modelValue + 1;
-  // if (index >= props.lap.telemetry.length) {
-  //   // index = props.lap.telemetry.length - 1;
+  // const index = currentIndex.value + 1;
+  // if (index >= lap.value.telemetry.length) {
+  //   // index = lap.value.telemetry.length - 1;
   //   state.playing = false;
   // } else {
   //   emit('update:modelValue', index);
@@ -103,7 +103,7 @@ function callback() {
   // }
 }
 
-// watch(() => props.modelValue, () => {
+// watch(() => currentIndex.value, () => {
 //   if (state.playing) callback();
 // });
 
@@ -137,7 +137,7 @@ function onPlayClick() {
   //   state.playing = false;
   // } else {
   //   state.playing = true;
-  //   if (props.modelValue === props.lap.telemetry.length - 1) {
+  //   if (currentIndex.value === lap.value.telemetry.length - 1) {
   //     emit('update:modelValue', 0);
   //   } else {
   //     startPlaying()
@@ -168,7 +168,7 @@ function onTimelineClick(e: MouseEvent) {
     // let offset = e.offsetX;
     // if (offset <= 12) offset = 0;
     // else if (offset >= )
-    const index = Math.floor(offset / width * (props.lap.telemetry.length - 1));
+    const index = Math.floor(offset / width * (lap.value.telemetry.length - 1));
     emit('update:modelValue', index);
   }
 }

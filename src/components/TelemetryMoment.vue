@@ -1,24 +1,13 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
+import { CarCorner } from '../lib/types';
+import { useRaceStore } from '../store';
+import { useDocumentEvent } from '../helpers';
 import TelemetryCorner from './TelemetryCorner.vue';
 import TelemetryMap from './TelemetryMap.vue';
 import TelemetryTimeline from './TelemetryTimeline.vue';
-import { CarCorner } from '../lib/types';
-import { formatLapTime, formatSpeed, calcSpeed, round } from '../lib/utils';
-import { TelemetryLap } from '../lib/data';
+import LapTable from './LapTable.vue';
 
-const props = defineProps<{
-  lap: TelemetryLap;
-  laps: TelemetryLap[];
-}>();
-
-const state = reactive({
-  currentIndex: 0,
-});
-
-watch(() => props.lap, () => {
-  state.currentIndex = 0;
-});
+const store = useRaceStore();
 
 const arrowKeys: Record<string, number> = {
   ArrowLeft: -1,
@@ -33,31 +22,26 @@ function onArrowKeyPress(e: KeyboardEvent) {
     let modifier = arrowKeys[e.key];
     if (e.ctrlKey) modifier *= 10;
     else if (e.shiftKey) modifier *= 30;
-    state.currentIndex += modifier;
+    store.setTelemetryIndex(store.currentDataPointIndex += modifier);
   }
 }
 
-document.addEventListener('keydown', onArrowKeyPress);
+const keydown = useDocumentEvent('keydown', onArrowKeyPress);
+keydown.activate();
 
-onBeforeUnmount(() => {
-  document.removeEventListener('keydown', onArrowKeyPress);
-});
+// const averageLapTime = computed(() => props.laps.reduce((total, l) => total + l.time, 0) / props.laps.length);
 
-const currentRow = computed(() => props.lap.telemetry[state.currentIndex]);
+// const overallSpeed = computed(() => {
+//   const averages = { max: props.lap.stats.speed.max, avg: 0 };
 
-const averageLapTime = computed(() => props.laps.reduce((total, l) => total + l.time, 0) / props.laps.length);
+//   props.laps.forEach((lap) => {
+//     averages.max = Math.max(averages.max, lap.stats.speed.max);
+//     averages.avg = averages.avg + lap.stats.speed.avg;
+//   });
+//   averages.avg /= props.laps.length;
 
-const overallSpeed = computed(() => {
-  const averages = { max: props.lap.stats.speed.max, avg: 0 };
-
-  props.laps.forEach((lap) => {
-    averages.max = Math.max(averages.max, lap.stats.speed.max);
-    averages.avg = averages.avg + lap.stats.speed.avg;
-  });
-  averages.avg /= props.laps.length;
-
-  return averages;
-});
+//   return averages;
+// });
 </script>
 <template>
   <!-- <div>
@@ -71,17 +55,17 @@ const overallSpeed = computed(() => {
   </div>-->
   <div class="flex w-full mt-8">
     <div class="flex flex-col justify-between">
-      <TelemetryCorner :corner="CarCorner.frontLeft" :data="currentRow" />
-      <TelemetryCorner :corner="CarCorner.rearLeft" :data="currentRow" />
+      <TelemetryCorner :corner="CarCorner.frontLeft" :data="store.currentDataPoint!" />
+      <TelemetryCorner :corner="CarCorner.rearLeft" :data="store.currentDataPoint!" />
     </div>
     <div class="w-32">&nbsp;</div>
     <div class="flex flex-col justify-between">
-      <TelemetryCorner :corner="CarCorner.frontRight" :data="currentRow" />
-      <TelemetryCorner :corner="CarCorner.rearRight" :data="currentRow" />
+      <TelemetryCorner :corner="CarCorner.frontRight" :data="store.currentDataPoint!" />
+      <TelemetryCorner :corner="CarCorner.rearRight" :data="store.currentDataPoint!" />
     </div>
     <div class="w-[300px] mx-4 flex flex-col justify-between">
       <div>
-        <slot />
+        <LapTable />
         <!-- <table class="font-bold mt-8 text-right">
           <tbody>
             <tr>
@@ -134,17 +118,12 @@ const overallSpeed = computed(() => {
       <!-- <Speedometer :row="telemetry" /> -->
     </div>
     <div class="relative w-[500px] h-[500px]">
-      <TelemetryMap
-        v-for="l in laps"
-        :key="l.lap"
-        :lap="l"
-        class="absolute top-0 left-0"
-        :class="{ 'z-20': l.lap === lap.lap }"
-        :current="l.lap === lap.lap ? currentRow : undefined"
-      />
+      <TelemetryMap v-for="l in store.selectedRace!.laps" :key="l.lap" :lap="l" class="absolute top-0 left-0"
+        :class="{ 'z-20': l.lap === store.selectedLap!.lap }"
+        :current="l.lap === store.selectedLap!.lap ? store.currentDataPoint : null" />
     </div>
   </div>
-  <TelemetryTimeline v-model="state.currentIndex" :lap="lap" />
+  <TelemetryTimeline />
 </template>
 
 <style>
@@ -153,28 +132,14 @@ const overallSpeed = computed(() => {
 }
 
 .timeline {
-  @apply w-full
-    h-8
-    p-3
-    relative
-    flex
-    items-center;
+  @apply w-full h-8 p-3 relative flex items-center;
 }
 
 .timeline-line {
-  @apply left-0
-    w-full
-    h-2
-    bg-black;
+  @apply left-0 w-full h-2 bg-black;
 }
 
 .marker {
-  @apply absolute
-    bg-blue-700
-    h-8
-    w-8
-    rounded-full
-    top-0
-    z-30;
+  @apply absolute bg-blue-700 h-8 w-8 rounded-full top-0 z-30;
 }
 </style>

@@ -1,6 +1,5 @@
-import { TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
 import { CarCorner, TelemetryCornerPrefix, ITelemetryCorners, ITelemetryValuePair } from '../types';
-
 
 export class TelemetryCorner implements ITelemetryCorners<number> {
   front: ITelemetryValuePair<number>;

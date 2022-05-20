@@ -1,8 +1,10 @@
-import { TelemetryDataArray, TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
+import { TelemetryDataArray } from 'forza-open-telemetry-server';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
 import { RaceCar } from './RaceCar';
 import { TelemetryLap } from './TelemetryLap';
+import { IRace } from '../types';
 
-export class Race {
+export class Race implements IRace {
   laps: TelemetryLap[] = [];
   previousLap: TelemetryLap | null = null;
   currentLap: TelemetryLap;

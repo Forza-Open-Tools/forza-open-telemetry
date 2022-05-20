@@ -1,4 +1,4 @@
-import { TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
 import { IDimensionalValue } from '../types';
 import { Statistics } from './Statistics';
 

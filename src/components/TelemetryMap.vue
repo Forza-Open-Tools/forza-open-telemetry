@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { getLapColorClass } from '../lib';
-import { TelemetryDataPoint, TelemetryLap } from '../lib/data';
+import { ITelemetryDataPoint, ITelemetryLap } from '../lib/types';
 
 const props = defineProps<{
-  lap: TelemetryLap;
-  current?: TelemetryDataPoint;
+  lap: ITelemetryLap;
+  current: ITelemetryDataPoint | null;
 }>();
 
 const svgPadding = 20;
 
-function getPoint(row: TelemetryDataPoint) {
+function getPoint(row: ITelemetryDataPoint) {
   return {
     x: Math.floor(row.position.x - props.lap.stats.position.x.min) + svgPadding,
     y: Math.floor(row.position.z - props.lap.stats.position.z.min) + svgPadding,
   };
 }
 
-function getCommand(row: TelemetryDataPoint, command = 'L') {
+function getCommand(row: ITelemetryDataPoint, command = 'L') {
   const point = getPoint(row);
   return `${command} ${point.x},${point.y}`;
 }
@@ -60,7 +60,7 @@ const colorClass = computed(() => getLapColorClass(props.lap.lap));
 const stroke = computed(() => ({
   width: props.current ? '7px' : '13px',
   opacity: props.current ? '1' : '0.5',
-  class:  colorClass.value.stroke,
+  class: colorClass.value.stroke,
 }));
 
 const viewBox = computed(() => {
@@ -75,24 +75,12 @@ const viewBox = computed(() => {
 </script>
 <template>
   <svg :viewBox="viewBox" style="background-color: transparent; width: 500px; height: 500px;">
-    <path
-      :d="path"
-      :class="stroke.class"
-      fill="transparent"
-      :stroke-width="stroke.width"
-      :stroke-opacity="stroke.opacity"
-    />
+    <path :d="path" :class="stroke.class" fill="transparent" :stroke-width="stroke.width"
+      :stroke-opacity="stroke.opacity" />
     <!-- <circle v-for="t in issues" :key="t.timestampMS" :cx="t.x" :cy="t.y" r="3px" :fill="t.color" /> -->
     <!-- <circle :cx="startPoint.x" :cy="startPoint.y" r="15" fill="black" /> -->
     <circle :cx="endPoint.x" :cy="endPoint.y" r="15" fill="black" />
-    <circle
-      v-if="currentPoint"
-      :cx="currentPoint.x"
-      :cy="currentPoint.y"
-      r="15"
-      fill="blue"
-      stroke="black"
-      stroke-width="2"
-    />
+    <circle v-if="currentPoint" :cx="currentPoint.x" :cy="currentPoint.y" r="15" fill="blue" stroke="black"
+      stroke-width="2" />
   </svg>
 </template>

@@ -1,8 +1,8 @@
-import { TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
-import { ITelemetryCorners } from '../types';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { ITelemetryCorners, IWheelsData } from '../types';
 import { TelemetryCorner } from './TelemetryCorner';
 
-export class WheelsData {
+export class WheelsData implements IWheelsData {
   rotationSpeed: ITelemetryCorners<number>;
   onRumbleStrip: ITelemetryCorners<number>;
   inPuddleDepth: ITelemetryCorners<number>;

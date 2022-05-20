@@ -1,8 +1,9 @@
-import { TelemetryDataArray, TelemetryDataArrayWrapper } from 'forza-open-telemetry-server';
+import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { ITelemetryLap } from '../types';
 import { LapStatistics } from './LapStatistics';
 import { TelemetryDataPoint } from './TelemetryDataPoint';
 
-export class TelemetryLap {
+export class TelemetryLap implements ITelemetryLap {
   lap = 0;
   time = 0;
   telemetry: TelemetryDataPoint[] = [];
