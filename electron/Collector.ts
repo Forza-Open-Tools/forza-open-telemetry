@@ -24,7 +24,8 @@ type MessageHandler = (msg: Buffer, rinfo: dgram.RemoteInfo) => void;
 
 class Collector {
   private server = dgram.createSocket('udp4');
-  private address: AddressInfo | null = null;
+  private _address: AddressInfo | null = null;
+  private running = false;
 
   constructor(private port: number, messageHandler: MessageHandler) {
     this.server.on('error', (err) => {
@@ -34,8 +35,8 @@ class Collector {
     this.server.on('message', messageHandler);
     this.server.on('listening', () => {
       this.running = true;
-      this.address = this.server.address();
-      console.log(`Collector listening on ${this.address.address}:${this.address.port}`);
+      this._address = this.server.address();
+      console.log(`Collector listening on ${this._address.address}:${this._address.port}`);
     })
     this.server.on('close', () => {
       this.running = false;
@@ -43,7 +44,9 @@ class Collector {
     })
   }
 
-  private running = false;
+  address() {
+    return this._address ? { ...this._address } : null;
+  }
 
   isRunning() {
     return this.running;

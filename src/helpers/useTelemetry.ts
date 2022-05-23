@@ -31,20 +31,66 @@ function processDataArray(raw: TelemetryDataArray) {
   }
 }
 
-function onTelemetry(raw: TelemetryDataArray): Promise<void> {
-  processDataArray(raw);
-  return Promise.resolve();
+function onTelemetry(data: TelemetryDataArray): void {
+  processDataArray(data);
 }
 
-const ipcClient = useIpcClient({
-  telemetry: onTelemetry,
-  collectorClosed: (reason) => {
-    console.log('Collector unexpected closed:', reason);
-    state.streamingError = reason;
-    state.streaming = false;
-    return Promise.resolve();
-  },
-});
+function onClosed(reason: string): void {
+  console.log('Collector unexpected closed:', reason);
+  state.streamingError = reason;
+  state.streaming = false;
+}
+
+function getDefaultResolveReject() {
+  return {
+    resolve(value?: unknown) { },
+    reject(reason: string) { },
+  };
+}
+
+const promises = {
+  started: getDefaultResolveReject(),
+  stopped: getDefaultResolveReject(),
+  restarted: getDefaultResolveReject(),
+};
+
+function createPromise(name: 'started' | 'stopped' | 'restarted', executor: () => void) {
+  return new Promise((resolve, reject) => {
+    promises[name] = { resolve, reject };
+    executor();
+  });
+}
+
+function onStarted(addressInfo: AddressInfo): void {
+  console.log('Collector has started');
+  state.address = addressInfo.address;
+  state.port = addressInfo.port;
+  state.streaming = true;
+  promises.started.resolve();
+}
+
+function onStopped(): void {
+  console.log('Collector has stopped');
+  state.address = '';
+  state.port = 0;
+  state.streaming = false;
+  promises.stopped.resolve();
+}
+
+function onRestarted(addressInfo: AddressInfo): void {
+  console.log('Collector has restarted');
+  state.address = addressInfo.address;
+  state.port = addressInfo.port;
+  state.streaming = true;
+  promises.restarted.resolve();
+}
+
+window.collectorApi
+  .onTelemetry(onTelemetry)
+  .onClosed(onClosed)
+  .onStarted(onStarted)
+  .onStopped(onStopped)
+  .onRestarted(onRestarted);
 
 function load(rows: TelemetryDataArray[]) {
   const current = state.currentRace;
@@ -56,25 +102,23 @@ function load(rows: TelemetryDataArray[]) {
   return race;
 }
 
-async function stopCollector() {
-  await ipcClient.send('stopCollector');
-  state.address = '';
-  state.port = 0;
-  state.streaming = false;
+function stopCollector() {
+  return createPromise('stopped', () => {
+    window.collectorApi.stop();
+  });
 }
 
-async function startCollector() {
-  const { address, port } = await ipcClient.send<AddressInfo>('startCollector');
-  state.address = address;
-  state.port = port;
-  state.streaming = true;
+function startCollector() {
+  return createPromise('started', () => {
+    window.collectorApi.start();
+  });
 }
 
-async function toggleCollector() {
+function toggleCollector() {
   if (state.streaming) {
-    await stopCollector();
+    return stopCollector();
   } else if (!state.streamingError) {
-    await startCollector();
+    return startCollector();
   }
 }
 

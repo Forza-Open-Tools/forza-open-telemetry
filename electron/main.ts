@@ -2,57 +2,55 @@ import { app, BrowserWindow } from 'electron';
 import { fork } from 'child_process';
 import * as path from 'path';
 import findOpenSocket from './find-open-socket';
+import { ipcMain, MessageChannelMain } from 'electron/main';
 
 const isDev = process.env.IS_DEV === "true"; // ? true : false;
 
-function createWindow(socketName: string) {
+function createMainWindow(): BrowserWindow {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1820,
+    height: 1024,
     webPreferences: {
       preload: path.join(__dirname, 'client-preload.js'),
       nodeIntegration: false,
     },
   });
 
-  // and load the index.html of the app.
-  // win.loadFile("index.html");
+  // In dev, use the vite server
+  // Otherwise load the compiled index.html
   mainWindow.loadURL(
     isDev
       ? 'http://localhost:3333'
       : `file://${path.join(__dirname, '../dist/index.html')}`
   );
-  // Open the DevTools.
+
+  // Open the DevTools
   if (isDev) {
     mainWindow.webContents.openDevTools();
   }
 
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('set-socket', {
-      name: socketName,
-    });
-  });
-
-  // mainWindow.webContents.send()
+  return mainWindow;
 }
 
-function createBackgroundWindow(socketName: string) {
+function createBackgroundWindow(): BrowserWindow {
   const win = new BrowserWindow({
     x: 500,
     y: 300,
     width: 700,
     height: 500,
-    show: true,
+    show: isDev, // shows window in dev, hides otherwise
     webPreferences: {
+      preload: path.join(__dirname, 'server-preload.js'),
       nodeIntegration: true
     }
   })
-  win.loadURL(`file://${__dirname}/server-dev.html`)
+  win.loadURL(`file://${__dirname}/server-dev.html`);
 
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('set-socket', { name: socketName })
-  })
+  // Open the DevTools.
+  if (isDev) {
+    win.webContents.openDevTools();
+  }
 
   return win;
 }
@@ -80,18 +78,22 @@ function createBackgroundProcess(socketName: string) {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   const serverSocket = await findOpenSocket();
-  createWindow(serverSocket);
+  const mainWindow = createMainWindow();
+  const serverWindow = createBackgroundWindow();
+
+  ipcMain.on('connect-to-collector', (event) => {
+    if (event.senderFrame === mainWindow.webContents.mainFrame) {
+      const { port1, port2 } = new MessageChannelMain();
+      serverWindow.webContents.postMessage('new-client', null, [port1]);
+      event.senderFrame.postMessage('collector-message-port', null, [port2]);
+    }
+  });
+
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow(serverSocket)
+    if (BrowserWindow.getAllWindows().length === 1) createMainWindow();
   });
-
-  if (isDev) {
-    createBackgroundWindow(serverSocket);
-  } else {
-    createBackgroundProcess(serverSocket);
-  }
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

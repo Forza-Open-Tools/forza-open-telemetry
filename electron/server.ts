@@ -4,38 +4,43 @@ import { TelemetryIpcServer, TelemetryIpcClient } from '../src/lib/ipc';
 import IpcServer from './IpcServer';
 import Collector from './Collector';
 
-(async () => {
-  const ipcHandlers = {
-    startCollector: () => collector.start(),
-    stopCollector: () => collector.stop(),
-    restartCollector: async () => {
-      if (collector.isRunning()) {
-        await collector.stop();
-      }
-      return collector.start();
-    },
-    isRunning: () => Promise.resolve(collector.isRunning()),
-    setPort: (port: number) => collector.setPort(port),
-  };
-  let ipcServer: IpcServer<TelemetryIpcServer, TelemetryIpcClient>;
+const parser = new Parser('ForzaHorizon5');
 
-  if (process.argv[2] === '--subprocess') {
-    const socketName = process.argv[4];
-    ipcServer = new IpcServer<TelemetryIpcServer, TelemetryIpcClient>(socketName, ipcHandlers);
-  } else {
-    ipcRenderer.on('set-socket', (event, { name }) => {
-      ipcServer = new IpcServer<TelemetryIpcServer, TelemetryIpcClient>(name, ipcHandlers);
-    });
+function messageHandler(buf: Buffer) {
+  const data = parser.toArray(buf);
+  window.collectorServerApi.telemetry(data);
+  // if (data[1]) {
+  //   ipcServer.send('telemetry', data);
+  // }
+}
+
+const collector = new Collector(11000, messageHandler);
+
+async function onStart() {
+  const addressInfo = await collector.start();
+  window.collectorServerApi.started(addressInfo);
+}
+
+async function onStop() {
+  await collector.stop();
+  window.collectorServerApi.stopped();
+}
+
+async function onRestart() {
+  await collector.stop();
+  const addressInfo = await collector.start();
+  window.collectorServerApi.restarted(addressInfo);
+}
+
+async function onUsePort(port: number) {
+  await collector.setPort(port);
+  const addressInfo = collector.address();
+  if (addressInfo) {
+    window.collectorServerApi.started(addressInfo);
   }
+}
 
-  const parser = new Parser('ForzaHorizon5');
-
-  function messageHandler(buf: Buffer) {
-    const data = parser.toArray(buf);
-    if (data[1]) {
-      ipcServer.send('telemetry', data);
-    }
-  }
-
-  const collector = new Collector(11000, messageHandler);
-})();
+window.collectorServerApi
+  .onStart(onStart)
+  .onStop(onStop)
+  .onRestart(onRestart);
