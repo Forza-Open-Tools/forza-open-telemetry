@@ -10,15 +10,16 @@ export class TelemetryLap implements ITelemetryLap {
   issues: TelemetryDataPoint[] = [];
   stats: LapStatistics = new LapStatistics();
 
-  constructor(lap: number) {
-    this.lap = lap;
+  constructor(lapIndex: number) {
+    this.lap = lapIndex + 1;
   }
 
-  add(data: TelemetryDataArrayWrapper) {
+  add(data: TelemetryDataArrayWrapper): TelemetryDataPoint {
     const point = new TelemetryDataPoint(data);
     this.telemetry.push(point);
     this.stats.add(point);
     this.time = point.lapTime;
+    return point;
   }
 
   // private checkSuspension(row: TelemetryDataArray): boolean {

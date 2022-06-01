@@ -1,11 +1,10 @@
-<script setup lang="ts">import { TelemetryDataArray } from 'forza-open-telemetry-server';
+<script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { TelemetryDataPoint } from '../lib/data';
-import { RaceCar } from '../lib/data/RaceCar';
+import { IRaceCar, ITelemetryDataPoint } from '../lib/types';
 
 const props = defineProps<{
-  car: RaceCar;
-  row: TelemetryDataPoint;
+  car: IRaceCar;
+  row: ITelemetryDataPoint;
 }>();
 
 const circle = reactive({
@@ -56,22 +55,17 @@ const startAngle = computed(() => {
     <div>Start Angle: {{ startAngle }}</div>
     <div>Speed: {{ Math.round(row.engine.speed) }} kph</div>
     <div>RPMs: {{ Math.round(row.engine.rpm) }}</div>
-    <div class="relative">
+    <!-- <div class="relative">
       <svg viewBox="0 0 100 70" class="bg-transparent w-full border-black border">
         <circle cx="50" cy="50" r="48" stroke="black" fill="transparent" />
       </svg>
       <div class="needle"></div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <style lang="postcss">
 .needle {
-  @apply absolute
-    w-1
-    h-[95px]
-    bg-black
-    bottom-[52px]
-    left-1/2;
+  @apply absolute w-1 h-[95px] bg-black bottom-[52px] left-1/2;
 }
 </style>

@@ -10,7 +10,7 @@ const data = computed<ChartData<'scatter'>>(() => {
   const datasets = store.selectedRace!.laps.map<ChartDataset<'scatter'>>((lap) => ({
     data: lap.telemetry.map((row) => ({
       x: row.position.x,
-      y: row.position.z,
+      y: -row.position.z,
 
     })),
     showLine: true,

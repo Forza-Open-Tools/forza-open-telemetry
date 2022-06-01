@@ -3,44 +3,61 @@ import { getLapColorClass } from '../lib';
 import { IRace, ITelemetryDataPoint, ITelemetryLap, LapColorClasses } from '../lib/types';
 
 interface UseRaceStoreState {
-  selectedIndex: number;
-  selectedRace: IRace | null;
-  selectedLapIndex: number;
-  currentDataPointIndex: number;
+  races: IRace[],
+  selected: {
+    race: number;
+    lap: number;
+    moment: number;
+  };
   lapColorClasses: LapColorClasses[];
 }
 
 export const useRaceStore = defineStore('racestore', {
   state: (): UseRaceStoreState => ({
-    selectedIndex: -1,
-    selectedRace: null,
-    selectedLapIndex: -1,
-    currentDataPointIndex: -1,
+    races: [],
+    selected: {
+      race: -1,
+      lap: -1,
+      moment: -1,
+    },
     lapColorClasses: [],
   }),
   getters: {
+    selectedRace(state): IRace | null {
+      if (state.selected.race < 0) return null;
+      return state.races[state.selected.race];
+    },
     selectedLap(state): ITelemetryLap | null {
-      if (!state.selectedRace) return null;
-      return state.selectedRace.laps[state.currentDataPointIndex];
+      if (state.selected.lap < 0) return null;
+      return this.selectedRace?.laps[state.selected.lap] || null;
     },
     currentDataPoint(state): ITelemetryDataPoint | null {
-      if (!this.selectedLap) return null;
-      return this.selectedLap.telemetry[state.currentDataPointIndex];
+      if (state.selected.moment < 0) return null;
+      return this.selectedLap?.telemetry[state.selected.moment] || null;
     }
   },
   actions: {
-    selectRace(race: IRace) {
-      this.selectedRace = race;
-      this.selectedLapIndex = 0;
-      this.lapColorClasses = race.laps.map((lap) => getLapColorClass(lap.lap));
+    selectRace(raceIndex: number) {
+      this.selected.race = raceIndex;
+      this.selected.lap = 0;
+      this.selected.moment = 0;
+      this.lapColorClasses = this.races[raceIndex].laps.map((lap) => getLapColorClass(lap.lap));
     },
     selectLap(lapIndex: number) {
-      if (lapIndex < this.selectedRace!.laps.length)
-        this.selectedLapIndex = lapIndex;
+      if (lapIndex < this.selectedRace!.laps.length) {
+        this.selected.lap = lapIndex;
+      }
+      const momentsLength = this.selectedRace?.laps[lapIndex].telemetry.length || 0;
+      if (this.selected.moment >= momentsLength) {
+        this.selected.moment = 0;
+      }
     },
     setTelemetryIndex(index: number) {
-      const maxLen = this.selectedRace!.laps.length
-      this.currentDataPointIndex = Math.max(Math.min(maxLen, index), 0);
-    }
-  }
+      const maxLen = this.selectedLap!.telemetry.length;
+      this.selected.moment = Math.max(Math.min(maxLen, index), 0);
+    },
+    addRace(race: IRace) {
+      this.races.push(race);
+    },
+  },
 });

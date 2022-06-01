@@ -1,8 +1,9 @@
-import { TelemetryDataArray } from 'forza-open-telemetry-server';
+import { IRace } from '../types';
+import { TelemetryDataArray } from './TelemetryDataArray';
 import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
 import { RaceCar } from './RaceCar';
 import { TelemetryLap } from './TelemetryLap';
-import { IRace } from '../types';
+import { LapStatistics } from './LapStatistics';
 
 export class Race implements IRace {
   laps: TelemetryLap[] = [];
@@ -14,10 +15,13 @@ export class Race implements IRace {
 
   car: RaceCar;
 
+  stats: LapStatistics = new LapStatistics();
+
   rawData: TelemetryDataArray[] = [];
 
   constructor(data: TelemetryDataArrayWrapper) {
     this.currentLap = new TelemetryLap(data.byName('lap'));
+    this.laps.push(this.currentLap);
     this.startTs = data.byName('timestampMS');
     this.endTs = this.startTs;
 
@@ -26,14 +30,15 @@ export class Race implements IRace {
 
   add(data: TelemetryDataArrayWrapper) {
     this.rawData.push(data.data);
-    const lapNum = data.byName('lap');
-    if (lapNum !== this.currentLap.lap) {
+    const lapIndex = data.byName('lap');
+    if ((lapIndex + 1) !== this.currentLap.lap) {
       this.previousLap = this.currentLap;
-      this.currentLap = new TelemetryLap(lapNum);
+      this.currentLap = new TelemetryLap(lapIndex);
       this.laps.push(this.currentLap);
     }
 
-    this.currentLap.add(data);
+    const point = this.currentLap.add(data);
+    this.stats.add(point);
     this.endTs = data.byName('timestampMS');
   }
 

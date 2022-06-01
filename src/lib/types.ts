@@ -168,4 +168,5 @@ export interface IRace {
   startTs: number;
   endTs: number;
   car: IRaceCar;
+  stats: ILapStatistics;
 }

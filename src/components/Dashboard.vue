@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { computed, defineComponent, reactive } from 'vue'
+import { computed, reactive } from 'vue'
+import { useTelemetry } from '../helpers';
+import { useRaceStore } from '../store';
 import TravelPath from './TravelPath.vue';
 import SuspensionChart from './SuspensionChart.vue';
 import RawTelemetry from './RawTelemetry.vue';
 import StatisticsForLap from './StatisticsForLap.vue';
 import LapTable from './LapTable.vue';
 import TelemetryMoment from './TelemetryMoment.vue';
-import { useTelemetry, useTelemetryJsonParser } from '../helpers';
-import { useRaceStore } from '../store';
+import FileDragAndDrop from './FileDragAndDrop.vue';
+import RaceList from './RaceList.vue';
 
 const state = reactive({
   wrapperClass: '',
@@ -23,43 +25,11 @@ const store = useRaceStore();
 const telemetry = useTelemetry();
 
 const streamingButtonText = computed(() => telemetry.state.streaming ? 'Stop' : 'Start');
-
-async function onToggleCollector() {
-  telemetry.toggleCollector();
-}
-
-const fileParser = useTelemetryJsonParser();
-
-async function onFileDrop(event: DragEvent) {
-  console.log('File dropped');
-  state.wrapperClass = '';
-  // clear();
-
-  if (event.dataTransfer?.items) {
-    for (let index = 0; index < event.dataTransfer.items.length; index++) {
-      const file = event.dataTransfer.items[index].getAsFile();
-      if (file) {
-        const rows = await fileParser.parseFile(file);
-        console.log('Recieved', rows.length, 'telemetry lines');
-        telemetry.load(rows);
-        console.log('Processed', rows.length);
-      }
-    }
-  }
-}
-
-function onDragOver() {
-  state.wrapperClass = 'wrapper-dragover';
-}
-
-function onDragLeave() {
-  state.wrapperClass = '';
-}
 </script>
 
 <template>
-  <div class="wrapper" :class="state.wrapperClass" @dragover.prevent="onDragOver" @dragleave="onDragLeave"
-    @drop.prevent="onFileDrop">
+  <FileDragAndDrop>
+    <RaceList />
     <div class="flex items-center p-2 border-b border-gray-700">
       <!-- <label>
         <input type="checkbox" v-model="state.show.travelPath" />
@@ -72,11 +42,11 @@ function onDragLeave() {
       <label class="ml-8">
         <input type="checkbox" v-model="state.show.telemetryTable" />
         Show Detail Table
-      </label>-->
+      </label>
       <button class="ml-8" type="button" @click="onToggleCollector">{{ streamingButtonText }} Collector</button>
 
       <div v-if="telemetry.state.streaming">Listening on {{ telemetry.state.address }}:{{ telemetry.state.port }}</div>
-      <!-- <div>
+      <div>
         <label>Throttle:</label>
         <input type="text" v-model="state.throttle" />
       </div>
@@ -94,7 +64,7 @@ function onDragLeave() {
       </div>
       <!-- <RawTelemetry v-if="state.show.telemetryTable" :lap="selectedLap" /> -->
     </template>
-  </div>
+  </FileDragAndDrop>
 </template>
 
 <style>

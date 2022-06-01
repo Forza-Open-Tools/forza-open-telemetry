@@ -6,6 +6,7 @@ import TelemetryCorner from './TelemetryCorner.vue';
 import TelemetryMap from './TelemetryMap.vue';
 import TelemetryTimeline from './TelemetryTimeline.vue';
 import LapTable from './LapTable.vue';
+import Speedometer from './Speedometer.vue';
 
 const store = useRaceStore();
 
@@ -22,7 +23,7 @@ function onArrowKeyPress(e: KeyboardEvent) {
     let modifier = arrowKeys[e.key];
     if (e.ctrlKey) modifier *= 10;
     else if (e.shiftKey) modifier *= 30;
-    store.setTelemetryIndex(store.currentDataPointIndex += modifier);
+    store.setTelemetryIndex(store.selected.moment += modifier);
   }
 }
 
@@ -58,7 +59,9 @@ keydown.activate();
       <TelemetryCorner :corner="CarCorner.frontLeft" :data="store.currentDataPoint!" />
       <TelemetryCorner :corner="CarCorner.rearLeft" :data="store.currentDataPoint!" />
     </div>
-    <div class="w-32">&nbsp;</div>
+    <div class="w-32 flex items-center">
+      <Speedometer :car="store.selectedRace!.car" :row="store.currentDataPoint!" />
+    </div>
     <div class="flex flex-col justify-between">
       <TelemetryCorner :corner="CarCorner.frontRight" :data="store.currentDataPoint!" />
       <TelemetryCorner :corner="CarCorner.rearRight" :data="store.currentDataPoint!" />
@@ -115,7 +118,6 @@ keydown.activate();
           <div class="min-w-[75px] text-right">rpm</div>
         </div> -->
       </div>
-      <!-- <Speedometer :row="telemetry" /> -->
     </div>
     <div class="relative w-[500px] h-[500px]">
       <TelemetryMap v-for="l in store.selectedRace!.laps" :key="l.lap" :lap="l" class="absolute top-0 left-0"

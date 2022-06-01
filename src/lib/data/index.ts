@@ -1,5 +1,10 @@
 export { CarCornerStatistics } from './CarCornerStatistics';
 export { LapStatistics } from './LapStatistics';
 export { Statistics } from './Statistics';
+export type { TelemetryDataRow } from './TelemetryDataRow';
+export type { TelemetryDataArray } from './TelemetryDataArray';
+export { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
 export { TelemetryDataPoint } from './TelemetryDataPoint';
 export { TelemetryLap } from './TelemetryLap';
+export { Race } from './Race';
+export { RaceCar } from './RaceCar';

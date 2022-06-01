@@ -1,8 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import utc from 'dayjs/plugin/utc';
-import { TelemetryDataArray, TelemetryDataRow, TelemetryDataArrayLookup } from 'forza-open-telemetry-server';
-import { CarCorner, TelemetryCornerPrefix } from './types';
 
 dayjs.extend(duration);
 dayjs.extend(utc);

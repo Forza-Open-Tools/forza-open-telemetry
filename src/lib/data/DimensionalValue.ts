@@ -15,6 +15,6 @@ export class DimensionalValue implements IDimensionalValue<number> {
   constructor(data: TelemetryDataArrayWrapper, prefix: DimensionalPrefix) {
     this.x = data.byName(`${prefix}X`);
     this.y = data.byName(`${prefix}Y`);
-    this.z = data.byName(`${prefix}Z`);
+    this.z = -data.byName(`${prefix}Z`);
   }
 }

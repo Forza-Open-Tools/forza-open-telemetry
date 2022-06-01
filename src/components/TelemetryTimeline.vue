@@ -3,15 +3,11 @@ import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { ITelemetryLap } from '../lib/types';
 import { useRaceStore } from '../store';
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', v: number): void,
-}>();
-
 const store = useRaceStore();
 
 const lap = computed(() => store.selectedLap!);
 const currentRow = computed(() => store.currentDataPoint!);
-const currentIndex = computed(() => store.currentDataPointIndex);
+const currentIndex = computed(() => store.selected.moment);
 
 const state = reactive({
   playing: false,
@@ -56,7 +52,7 @@ function getNextFrameIndex() {
     const racetime = lap.value.telemetry[index].raceTime * 1000;
     const currentRaceTime = currentRow.value.raceTime * 1000;
     // const racetimeDiff = racetime - currentRow.value.currentRaceTime * 1000;
-    console.log('index', index, 'racetime', racetime, 'currentRaceTime', currentRaceTime, 'adjusted', adjusted); // 'racetimeDiff', racetimeDiff,
+    // console.log('index', index, 'racetime', racetime, 'currentRaceTime', currentRaceTime, 'adjusted', adjusted); // 'racetimeDiff', racetimeDiff,
     if (currentRaceTime + adjusted > racetime) {
       state.playStarted = Date.now();
       return index;
@@ -74,9 +70,9 @@ function callback() {
   // const nextDelay = getDelay(currentIndex.value);
   // state.delay = nextDelay;
   const index = getNextFrameIndex();
-  console.log('callback index', index);
+  // console.log('callback index', index);
   if (index > -1) {
-    emit('update:modelValue', index);
+    store.setTelemetryIndex(index);
   } else {
     state.playing = false;
   }
@@ -126,7 +122,7 @@ function onBackClick() {
   // if (state.playing) {
   //   startInterval();
   // }
-  emit('update:modelValue', 0);
+  store.setTelemetryIndex(0);
 }
 
 function onPlayClick() {
@@ -169,7 +165,7 @@ function onTimelineClick(e: MouseEvent) {
     // if (offset <= 12) offset = 0;
     // else if (offset >= )
     const index = Math.floor(offset / width * (lap.value.telemetry.length - 1));
-    emit('update:modelValue', index);
+    store.setTelemetryIndex(index);
   }
 }
 

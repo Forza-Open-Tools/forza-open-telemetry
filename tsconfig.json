@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "outDir": "./dist/",
-    "useDefineForClassFields": true,
     "module": "CommonJS",
     "moduleResolution": "node",
     "strict": true,
     "jsx": "preserve",
+    "useDefineForClassFields": true,
     "sourceMap": true,
+    "importsNotUsedAsValues": "remove",
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "outDir": "./dist",
     "lib": [
       "esnext",
       "dom"
@@ -24,5 +25,5 @@
   ],
   "exclude": [
     "node_modules"
-  ],
+  ]
 }

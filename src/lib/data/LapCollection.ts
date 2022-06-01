@@ -1,4 +1,4 @@
-// import { TelemetryDataArray } from 'forza-open-telemetry-server';
+// import { TelemetryDataArray } from '../lib';
 // import { TelemetryDataRow } from './types';
 // import TelemetryLap from './TelemetryLap';
 

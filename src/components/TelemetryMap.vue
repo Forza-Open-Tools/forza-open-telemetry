@@ -2,18 +2,21 @@
 import { computed } from 'vue';
 import { getLapColorClass } from '../lib';
 import { ITelemetryDataPoint, ITelemetryLap } from '../lib/types';
+import { useRaceStore } from '../store';
 
 const props = defineProps<{
   lap: ITelemetryLap;
   current: ITelemetryDataPoint | null;
 }>();
 
+const store = useRaceStore();
+
 const svgPadding = 20;
 
 function getPoint(row: ITelemetryDataPoint) {
   return {
-    x: Math.floor(row.position.x - props.lap.stats.position.x.min) + svgPadding,
-    y: Math.floor(row.position.z - props.lap.stats.position.z.min) + svgPadding,
+    x: Math.floor(row.position.x),
+    y: Math.ceil(row.position.z),
   };
 }
 
@@ -22,16 +25,26 @@ function getCommand(row: ITelemetryDataPoint, command = 'L') {
   return `${command} ${point.x},${point.y}`;
 }
 
+function commandPointAreEqual(cmd1: string, cmd2: string) {
+  return cmd1.slice(2) === cmd2.slice(2);
+}
+
 const path = computed(() => {
   const commands = [];
   if (props.lap.telemetry.length) {
-    commands.push(getCommand(props.lap.telemetry[0], 'M'));
+    const start = getCommand(props.lap.telemetry[0], 'M')
+    commands.push(start);
     let lastTime = 0;
+    let lastCommand = start;
     const skipTimeAmount = 300;
     props.lap.telemetry.forEach((row) => {
-      if (row.timestampMS - lastTime >= skipTimeAmount) {
-        commands.push(getCommand(row));
+      const command = getCommand(row);
+      // console.log(lastCommand.slice(2), command.slice(2));
+      if (row.timestampMS - lastTime >= skipTimeAmount && lastCommand.slice(2) !== command.slice(2)) {
+        // console.log('adding command', command);
+        commands.push(command);
         lastTime = row.timestampMS;
+        lastCommand = command;
       }
     });
 
@@ -65,10 +78,10 @@ const stroke = computed(() => ({
 
 const viewBox = computed(() => {
   return [
-    0,
-    0,
-    Math.floor(Math.abs(props.lap.stats.position.x.max - props.lap.stats.position.x.min) + svgPadding * 2),
-    Math.ceil(Math.abs(props.lap.stats.position.z.max - props.lap.stats.position.z.min) + svgPadding * 2),
+    Math.floor(store.selectedRace!.stats.position.x.min) - svgPadding,
+    Math.ceil(store.selectedRace!.stats.position.z.min) - svgPadding,
+    Math.floor(Math.abs(store.selectedRace!.stats.position.x.max - store.selectedRace!.stats.position.x.min) + svgPadding * 2),
+    Math.ceil(Math.abs(store.selectedRace!.stats.position.z.max - store.selectedRace!.stats.position.z.min) + svgPadding * 2),
   ].join(' ');
 });
 

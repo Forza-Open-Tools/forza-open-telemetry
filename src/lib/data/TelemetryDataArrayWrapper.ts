@@ -1,6 +1,7 @@
-import { TelemetryDataRow, TelemetryDataArray } from 'forza-open-telemetry-server';
+import { TelemetryDataArray } from './TelemetryDataArray';
+import { TelemetryDataRow } from './TelemetryDataRow';
 
-function getTelemetryDataArrayIndexNames(): Readonly<Record<keyof TelemetryDataRow, number>> {
+function getTelemetryDataArrayIndexMap(): Readonly<TelemetryIndexMap<TelemetryDataRow>> {
   let index = 0;
   return {
     epochMs: index++,
@@ -95,39 +96,89 @@ function getTelemetryDataArrayIndexNames(): Readonly<Record<keyof TelemetryDataR
   };
 }
 
-const mapByName = getTelemetryDataArrayIndexNames();
+type TelemetryIndexMap<T> = Record<keyof T, number>
 
-function createMapByIndex() {
-  const map: Record<number, keyof TelemetryDataRow> = {};
+type TelemetryDataRowNoEpochMs = Omit<TelemetryDataRow, 'epochMs'>;
+type TelemetryDataRowNoUnknowns = Omit<TelemetryDataRow, 'unknown1' | 'unknown2'>;
+
+function createMap<T extends TelemetryDataRowNoEpochMs | TelemetryDataRowNoUnknowns>(mapByName: TelemetryIndexMap<TelemetryDataRow>, fieldsToOmit: (keyof TelemetryDataRow)[]) {
+  const map = {} as TelemetryIndexMap<T>;
+  let offset = 0;
   Object.entries(mapByName).forEach(([key, value]) => {
-    map[value] = key as keyof TelemetryDataRow;
+    if (fieldsToOmit.includes(key as keyof TelemetryDataRow)) {
+      offset += 1;
+      return;
+    }
+    map[key as keyof T] = value - offset;
   });
   return map;
 }
 
-const mapByIndex = createMapByIndex();
+function createMapByIndex<T extends TelemetryDataRowNoEpochMs | TelemetryDataRowNoUnknowns>(source: Record<keyof T, number>) {
+  const map: Record<number, keyof T> = {};
+  Object.entries(source).forEach(([key, value]) => {
+    map[value] = key as keyof T;
+  });
+  return map;
+}
 
-export class TelemetryDataArrayLookup {
-  indexOf(name: keyof TelemetryDataRow): number {
-    return mapByName[name];
-  }
+const mapByNameFull = getTelemetryDataArrayIndexMap();
+// const mapByNameNoEpochMs = createMap(mapByNameFull, ['epochMs']);
+// const mapByNameNoUnknown = createMap(mapByNameFull, ['unknown1', 'unknown2']);
+// const mapByNameNoEpochNoUnknown = createMap(mapByNameFull, ['epochMs', 'unknown1', 'unknown2']);
 
-  nameOf(index: number): keyof TelemetryDataRow {
-    return mapByIndex[index];
+const fullLength = Object.keys(mapByNameFull).length;
+const mapLengths = {
+  full: fullLength,
+  noEpochMs: fullLength - 1,
+  noUnknown: fullLength - 2,
+  noEpochNoUnknown: fullLength - 3,
+}
+
+// const mapsByName = {
+//   [Object.keys(mapByNameFull).length]: mapByNameFull,
+//   [Object.keys(mapByNameNoEpochMs).length]: mapByNameNoEpochMs,
+//   [Object.keys(mapByNameNoUnknown).length]: mapByNameNoUnknown,
+//   [Object.keys(mapByNameNoEpochNoUnknown).length]: mapByNameNoEpochNoUnknown,
+// }
+
+// const mapsByIndex = {
+//   [Object.keys(mapByNameFull).length]: createMapByIndex(mapByNameFull),
+//   [Object.keys(mapByNameNoEpochMs).length]: createMapByIndex(mapByNameNoEpochMs),
+//   [Object.keys(mapByNameNoUnknown).length]: createMapByIndex(mapByNameNoUnknown),
+//   [Object.keys(mapByNameNoEpochNoUnknown).length]: createMapByIndex(mapByNameNoEpochNoUnknown),
+// }
+
+function addMissingFields(data: unknown[]): TelemetryDataArray {
+  const updated = [...data] as TelemetryDataArray;
+  if (updated.length === mapLengths.full) {
+    return updated;
   }
+  if (updated.length === mapLengths.noEpochMs) {
+    updated.splice(0, 0, updated[1]);
+  } else if (updated.length === mapLengths.noUnknown) {
+    updated.splice(mapByNameFull.unknown1, 0, -999, -999);
+  } else if (updated.length === mapLengths.noEpochNoUnknown) {
+    updated.splice(0, 0, updated[1]);
+    updated.splice(mapByNameFull.unknown1, 0, -999, -999);
+  }
+  return updated;
 }
 
 export class TelemetryDataArrayWrapper {
-  lookup = new TelemetryDataArrayLookup();
+  dataArray: TelemetryDataArray;
 
-  constructor(private dataArray: TelemetryDataArray) { }
+  constructor(dataArray: TelemetryDataArray) {
+    this.dataArray = addMissingFields(dataArray);
+  }
 
   byIndex<T extends number | boolean = number>(index: number): T {
     return this.dataArray[index] as T;
   }
 
   byName<T extends number | boolean = number>(name: keyof TelemetryDataRow): T {
-    return this.dataArray[this.lookup.indexOf(name)] as T;
+    const index = mapByNameFull[name];
+    return this.dataArray[index] as T;
   }
 
   get data() {
