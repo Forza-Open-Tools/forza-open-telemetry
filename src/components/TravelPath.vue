@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { ChartData, ChartDataset, ChartOptions } from 'chart.js';
-import { ScatterChart } from 'vue-chart-3';
+import { Chart as ChartJS, ChartData, ChartDataset, ChartOptions, PointElement, LineElement, Tooltip, Legend } from 'chart.js';
+import { Scatter } from 'vue-chartjs'
 import { useRaceStore } from '../store';
 
 const store = useRaceStore();
 
+ChartJS.register(PointElement, LineElement, Tooltip, Legend);
+
 const data = computed<ChartData<'scatter'>>(() => {
-  const datasets = store.selectedRace!.laps.map<ChartDataset<'scatter'>>((lap) => ({
+  const datasets = store.selectedRace!.laps.map<ChartDataset<'scatter', { x: number, y: number }[]>>((lap) => ({
     data: lap.telemetry.map((row) => ({
       x: row.position.x,
       y: -row.position.z,
@@ -50,7 +52,7 @@ const options: ChartOptions = {
 </script>
 
 <template>
-  <ScatterChart :chart-data="data" :options="options" class="square-chart" />
+  <Scatter :data="data" :options="options" class="square-chart" />
 </template>
 
 <style>

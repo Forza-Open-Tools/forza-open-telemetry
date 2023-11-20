@@ -1,11 +1,11 @@
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 import { CarCorner, TelemetryCornerPrefix, ITelemetryCorners, ITelemetryValuePair } from '../types';
 
 export class TelemetryCorner implements ITelemetryCorners<number> {
   front: ITelemetryValuePair<number>;
   rear: ITelemetryValuePair<number>;
 
-  constructor(data: TelemetryDataArrayWrapper, prefix: TelemetryCornerPrefix) {
+  constructor(data: TelemetryDataRow, prefix: TelemetryCornerPrefix) {
     this.front = {
       left: data.byName(`${prefix}${CarCorner.frontLeft}`),
       right: data.byName(`${prefix}${CarCorner.frontRight}`),

@@ -23,7 +23,7 @@ export default function useSocket(port = 5555, host = 'localhost') {
     state.error = true;
   });
 
-  function on(event: string, callback: (data: any) => void) {
+  function on<T>(event: string, callback: (data: T) => void) {
     socket.on(event, callback);
   }
 

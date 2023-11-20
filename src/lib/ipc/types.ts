@@ -1,5 +1,4 @@
 import { AddressInfo, Socket } from 'net';
-import { TelemetryDataArray } from 'forza-open-telemetry-server';
 
 export enum IpcMessageType {
   reply,
@@ -18,7 +17,7 @@ export type IpcMessageHandler = (...args: any[]) => Promise<unknown>;
 export type IpcMessageHandlers = Record<string, IpcMessageHandler>;
 
 export interface TelemetryIpcClient extends IpcMessageHandlers {
-  telemetry(data: TelemetryDataArray): Promise<void>;
+  telemetry(data: number[]): Promise<void>;
   collectorClosed(reason: string): Promise<void>;
 }
 

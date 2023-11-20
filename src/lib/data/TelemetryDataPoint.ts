@@ -1,4 +1,4 @@
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 import { IDimensionalValue, ITelemetryDataPoint } from '../types';
 import { CarControls } from './CarControls';
 import { CarEngine } from './CarEngine';
@@ -24,7 +24,7 @@ export class TelemetryDataPoint implements ITelemetryDataPoint {
   wheels: WheelsData;
   tires: TiresData;
 
-  constructor(public data: TelemetryDataArrayWrapper) {
+  constructor(public data: TelemetryDataRow) {
     this.epochMs = this.data.byName('epochMs');
     this.timestampMS = this.data.byName('timestampMS');
     this.lapTime = this.data.byName('currentLapTime');

@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { TelemetryDataArray } from 'forza-open-telemetry-server/dist';
 import { AddressInfo } from 'net';
 
 declare global {
@@ -13,7 +12,7 @@ export interface CollectorServerIpcApi {
   onStop(handler: () => void): CollectorServerIpcApi;
   onRestart(handler: () => void): CollectorServerIpcApi;
   onUsePort(handler: (port: number) => void): CollectorServerIpcApi;
-  telemetry(data: TelemetryDataArray): CollectorServerIpcApi;
+  telemetry(data: number[]): CollectorServerIpcApi;
   close(reason: string): CollectorServerIpcApi;
   started(addressInfo: AddressInfo): CollectorServerIpcApi;
   stopped(): CollectorServerIpcApi;
@@ -82,7 +81,7 @@ const collectorServerApi: CollectorServerIpcApi = {
     postMessage('restarted', addressInfo);
     return collectorServerApi;
   },
-  telemetry: (data: TelemetryDataArray) => {
+  telemetry: (data: number[]) => {
     postMessage('telemetry', data);
     return collectorServerApi;
   },

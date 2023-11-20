@@ -1,4 +1,4 @@
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 import { ICarEngine } from '../types';
 
 export class CarEngine implements ICarEngine {
@@ -9,7 +9,7 @@ export class CarEngine implements ICarEngine {
   boost: number;
   fuel: number;
 
-  constructor(data: TelemetryDataArrayWrapper) {
+  constructor(data: TelemetryDataRow) {
     this.rpm = data.byName('currentEngineRpm');
     this.speed = data.byName('speed');
     this.power = data.byName('power');

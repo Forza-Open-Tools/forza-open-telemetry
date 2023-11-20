@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { TelemetryLap } from '../lib/data';
+import { ITelemetryLap } from '../lib/types';
 import { formatAsPercent, formatAsTemp } from '../lib/utils';
 import StatisticsTable from './StatisticsTable.vue';
 
 const props = defineProps<{
-  lap: TelemetryLap;
+  lap: ITelemetryLap;
 }>();
 
 function formatTemp(value: number) {

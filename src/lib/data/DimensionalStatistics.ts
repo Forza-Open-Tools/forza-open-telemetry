@@ -1,4 +1,4 @@
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 import { IDimensionalValue } from '../types';
 import { Statistics } from './Statistics';
 

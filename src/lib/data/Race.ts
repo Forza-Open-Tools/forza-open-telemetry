@@ -1,9 +1,8 @@
 import { IRace } from '../types';
-import { TelemetryDataArray } from './TelemetryDataArray';
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
 import { RaceCar } from './RaceCar';
 import { TelemetryLap } from './TelemetryLap';
 import { LapStatistics } from './LapStatistics';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 
 export class Race implements IRace {
   laps: TelemetryLap[] = [];
@@ -17,9 +16,9 @@ export class Race implements IRace {
 
   stats: LapStatistics = new LapStatistics();
 
-  rawData: TelemetryDataArray[] = [];
+  rawData: number[][] = [];
 
-  constructor(data: TelemetryDataArrayWrapper) {
+  constructor(data: TelemetryDataRow) {
     this.currentLap = new TelemetryLap(data.byName('lap'));
     this.laps.push(this.currentLap);
     this.startTs = data.byName('timestampMS');
@@ -28,7 +27,7 @@ export class Race implements IRace {
     this.car = new RaceCar(data);
   }
 
-  add(data: TelemetryDataArrayWrapper) {
+  add(data: TelemetryDataRow) {
     this.rawData.push(data.data);
     const lapIndex = data.byName('lap');
     if ((lapIndex + 1) !== this.currentLap.lap) {

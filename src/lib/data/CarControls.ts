@@ -1,5 +1,5 @@
 import { ICarControls } from '../types';
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 
 export class CarControls implements ICarControls {
   accelerator: number;
@@ -9,7 +9,7 @@ export class CarControls implements ICarControls {
   gear: number;
   steer: number;
 
-  constructor(data: TelemetryDataArrayWrapper) {
+  constructor(data: TelemetryDataRow) {
     this.accelerator = data.byName('accelerator');
     this.brake = data.byName('brake');
     this.clutch = data.byName('clutch');

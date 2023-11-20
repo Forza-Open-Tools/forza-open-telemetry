@@ -1,4 +1,4 @@
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 import { IRaceCar } from '../types';
 
 const carClassLookup: Record<number, string> = {
@@ -24,7 +24,7 @@ export class RaceCar implements IRaceCar {
   make = '';
   model = '';
 
-  constructor(data: TelemetryDataArrayWrapper) {
+  constructor(data: TelemetryDataRow) {
     this.ordinal = data.byName('carOrdinal');
     this.carClassId = data.byName('carClass');
     this.carClass = carClassLookup[this.carClassId] || this.carClassId.toString();

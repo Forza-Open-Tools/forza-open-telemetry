@@ -1,3 +1,15 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { TelemetryLap } from '../lib/data';
+import { formatLapTime } from '../lib/utils';
+
+const props = defineProps<{
+  lap: TelemetryLap,
+}>();
+
+const startTs = computed(() => props.lap.telemetry[0].timestampMS)
+</script>
+
 <template>
   <h2>Lap #{{ lap.lap }}</h2>
   <table>
@@ -111,29 +123,3 @@
     </tbody>
   </table>
 </template>
-
-<script lang="ts">
-import { computed, defineComponent, PropType } from "vue";
-import { ScatterChart } from 'vue-chart-3';
-import { TelemetryLap } from '../lib/data';
-import { formatLapTime } from '../lib/utils';
-
-export default defineComponent({
-  components: { ScatterChart },
-  props: {
-    lap: {
-      type: Object as PropType<TelemetryLap>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const startTs = computed(() => props.lap.telemetry[0].timestampMS)
-
-
-    return {
-      startTs,
-      formatLapTime,
-    }
-  },
-})
-</script>

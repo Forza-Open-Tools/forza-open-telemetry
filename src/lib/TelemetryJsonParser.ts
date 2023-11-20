@@ -1,16 +1,33 @@
-import { TelemetryDataArray, TelemetryDataArrayWrapper } from '../lib/data';
 import { Race } from '../lib/data/Race';
+import { TelemetryDataRow } from './TelemetryDataRow';
+import { TelemetryFormat } from 'forza-open-telemetry-server';
+import { PropertyToIndexMap} from './PropertyToIndexMap';
+import { dashFormatLabels } from './dash-format-labels';
+
+const formatLabelsMap: Record<string, PropertyToIndexMap> = {
+  'Dash': new PropertyToIndexMap(dashFormatLabels),
+}
 
 export class TelemetryJsonParser {
   // intentionally not reactive
   isRaceOn = false;
   currentRace: Race | null = null;
-  rows: TelemetryDataArray[] = [];
+  rows: number[][] = [];
   races: Race[] = [];
   count = 0;
 
-  processDataArray(raw: TelemetryDataArray) {
-    const data = new TelemetryDataArrayWrapper(raw);
+  propMap: PropertyToIndexMap;
+
+  constructor(format: TelemetryFormat) {
+    this.propMap = formatLabelsMap[format];
+  }
+
+  useFormat(format: TelemetryFormat) {
+    this.propMap = formatLabelsMap[format];
+  }
+
+  processDataArray(raw: number[]) {
+    const data = new TelemetryDataRow(this.propMap, raw);
 
     if (!data.byName('isRaceOn')) {
       this.isRaceOn = false;
@@ -36,7 +53,7 @@ export class TelemetryJsonParser {
     lines.forEach((line, index) => {
       if (line.trim()) { //  && this.count < 200
         try {
-          const row = JSON.parse(line) as TelemetryDataArray;
+          const row = JSON.parse(line) as number[];
           this.processDataArray(row);
         } catch (error) {
           console.error('Error parsing line', index);

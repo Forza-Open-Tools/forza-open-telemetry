@@ -1,4 +1,4 @@
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 import { ITelemetryLap } from '../types';
 import { LapStatistics } from './LapStatistics';
 import { TelemetryDataPoint } from './TelemetryDataPoint';
@@ -14,7 +14,7 @@ export class TelemetryLap implements ITelemetryLap {
     this.lap = lapIndex + 1;
   }
 
-  add(data: TelemetryDataArrayWrapper): TelemetryDataPoint {
+  add(data: TelemetryDataRow): TelemetryDataPoint {
     const point = new TelemetryDataPoint(data);
     this.telemetry.push(point);
     this.stats.add(point);

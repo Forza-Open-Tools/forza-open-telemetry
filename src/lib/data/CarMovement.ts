@@ -1,4 +1,4 @@
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 import { ICarMovement, IDimensionalValue } from '../types';
 import { DimensionalValue } from './DimensionalValue';
 
@@ -10,7 +10,7 @@ export class CarMovement implements ICarMovement {
   pitch: number;
   roll: number;
 
-  constructor(data: TelemetryDataArrayWrapper) {
+  constructor(data: TelemetryDataRow) {
     this.acceleration = new DimensionalValue(data, 'acceleration');
     this.velocity = new DimensionalValue(data, 'velocity');
     this.angularVelocity = new DimensionalValue(data, 'angularVelocity');

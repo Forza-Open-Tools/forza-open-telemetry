@@ -1,9 +1,8 @@
 <script setup lang="ts">import { computed } from 'vue';
-import { LapStatistics, Statistics, TelemetryLap } from '../lib/data';
-import { ITelemetryCorners } from '../lib/types';
+import { IStatistics, ITelemetryCorners } from '../lib/types';
 
 const props = defineProps<{
-  stats: ITelemetryCorners<Statistics>;
+  stats: ITelemetryCorners<IStatistics>;
   label: string;
   formatter?: (value: number) => string;
 }>();

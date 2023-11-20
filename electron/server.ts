@@ -1,8 +1,6 @@
 import { ipcRenderer } from 'electron';
-import { Parser } from 'forza-open-telemetry-server';
+import { Parser, Collector } from 'forza-open-telemetry-server';
 import { TelemetryIpcServer, TelemetryIpcClient } from '../src/lib/ipc';
-import IpcServer from './IpcServer';
-import Collector from './Collector';
 
 const parser = new Parser('ForzaHorizon5');
 
@@ -17,8 +15,8 @@ function messageHandler(buf: Buffer) {
 const collector = new Collector(11000, messageHandler);
 
 async function onStart() {
-  const addressInfo = await collector.start();
-  window.collectorServerApi.started(addressInfo);
+  await collector.start();
+  window.collectorServerApi.started(collector.address());
 }
 
 async function onStop() {
@@ -28,8 +26,8 @@ async function onStop() {
 
 async function onRestart() {
   await collector.stop();
-  const addressInfo = await collector.start();
-  window.collectorServerApi.restarted(addressInfo);
+  await collector.start();
+  window.collectorServerApi.restarted(collector.address());
 }
 
 async function onUsePort(port: number) {

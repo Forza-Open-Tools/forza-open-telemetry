@@ -1,4 +1,4 @@
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 import { ITelemetryCorners, ITiresData } from '../types';
 import { TelemetryCorner } from './TelemetryCorner';
 
@@ -8,7 +8,7 @@ export class TiresData implements ITiresData {
   combinedSlip: ITelemetryCorners<number>;
   temp: ITelemetryCorners<number>;
 
-  constructor(data: TelemetryDataArrayWrapper) {
+  constructor(data: TelemetryDataRow) {
     this.slipRatio = new TelemetryCorner(data, 'tireSlipRatio');
     this.slipAngle = new TelemetryCorner(data, 'tireSlipAngle');
     this.combinedSlip = new TelemetryCorner(data, 'tireCombinedSlip');

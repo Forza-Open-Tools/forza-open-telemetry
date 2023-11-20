@@ -1,8 +1,9 @@
-import { TelemetryDataArray } from '../lib/data';
-import { AddressInfo } from 'net';
+import { TelemetryDataRow } from '../lib';
 import { reactive, readonly } from 'vue';
 import { Race } from '../lib/data/Race';
-import { TelemetryDataArrayWrapper } from '../lib/data/TelemetryDataArrayWrapper';
+import useSocket from '../components/useSocket';
+import { PropertyToIndexMap } from '../lib/PropertyToIndexMap';
+import { dashFormatLabels } from '../lib/dash-format-labels';
 
 const state = reactive({
   streamingError: '',
@@ -15,7 +16,9 @@ const state = reactive({
   savedRaces: [] as string[],
 });
 
-function onTelemetry(data: TelemetryDataArray): void {
+const socket = useSocket();
+
+function onTelemetry(data: number[]): void {
   processDataArray(data);
 }
 
@@ -32,16 +35,18 @@ function getDefaultResolveReject() {
   };
 }
 
-function connect(address: string) {
-
+function connect() {
+  socket.connect();
 }
 
 function disconnect() {
-
+  socket.disconnect();
 }
 
-function processDataArray(raw: TelemetryDataArray) {
-  const data = new TelemetryDataArrayWrapper(raw);
+const map = new PropertyToIndexMap(dashFormatLabels)
+
+function processDataArray(raw: number[]) {
+  const data = new TelemetryDataRow(map, raw);
 
   if (!data.byName('isRaceOn')) {
     state.isRaceOn = false;
@@ -55,7 +60,7 @@ function processDataArray(raw: TelemetryDataArray) {
   }
 }
 
-function load(rows: TelemetryDataArray[]) {
+function load(rows: number[][]) {
   const current = state.currentRace;
   rows.forEach(processDataArray);
   const race = state.currentRace;
@@ -64,6 +69,7 @@ function load(rows: TelemetryDataArray[]) {
   }
   return race;
 }
+
 
 export function useTelemetry() {
   return {

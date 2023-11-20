@@ -12,6 +12,6 @@ export default defineConfig({
   },
   // base: '/forza-open-telemetry/',
   build: {
-    outDir: 'docs',
+    outDir: 'dist',
   }
 })

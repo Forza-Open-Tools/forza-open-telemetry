@@ -19,7 +19,7 @@ function createMainWindow(): BrowserWindow {
   mainWindow.loadURL(
     isDev
       ? 'http://localhost:3333'
-      : `file://${path.join(__dirname, '../dist/index.html')}`
+      : `file://${path.join(__dirname, '../index.html')}`
   );
 
   // Open the DevTools

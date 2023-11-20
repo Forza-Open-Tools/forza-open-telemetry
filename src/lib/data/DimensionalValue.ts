@@ -1,4 +1,4 @@
-import { TelemetryDataArrayWrapper } from './TelemetryDataArrayWrapper';
+import { TelemetryDataRow } from '../TelemetryDataRow';
 import { IDimensionalValue } from '../types';
 
 type DimensionalPrefix =
@@ -12,7 +12,7 @@ export class DimensionalValue implements IDimensionalValue<number> {
   y: number;
   z: number;
 
-  constructor(data: TelemetryDataArrayWrapper, prefix: DimensionalPrefix) {
+  constructor(data: TelemetryDataRow, prefix: DimensionalPrefix) {
     this.x = data.byName(`${prefix}X`);
     this.y = data.byName(`${prefix}Y`);
     this.z = -data.byName(`${prefix}Z`);
