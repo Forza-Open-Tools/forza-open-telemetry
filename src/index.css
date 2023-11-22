@@ -2,41 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply h-screen;
-}
+@layer components {
 
-input,
-select,
-textarea,
-button,
-.button {
-  @apply
-    border
-    border-black
-    rounded
-    px-2
-    py-1;
-}
+  body {
+    @apply
+      h-screen
+      bg-stone-900
+      text-white;
+  }
 
-label {
-  @apply
-    block
-    text-sm;
-}
+  input,
+  select,
+  textarea,
+  button,
+  button[type="button"],
+  .button {
+    @apply
+      border
+      border-gray-200
+      bg-gray-200
+      rounded
+      px-2
+      py-1
+      text-black;
+  }
 
-th, td {
-  @apply py-1 px-2;
-}
+  label {
+    @apply
+      block
+      text-sm
+      align-baseline;
+  }
 
-tr.multi-row th {
-  @apply pb-0;
-}
+  th, td {
+    @apply py-1 px-2;
+  }
 
-tr.multi-row+tr.multi-row th {
-  @apply pt-0;
-}
+  tr.multi-row th {
+    @apply pb-0;
+  }
 
-tr th:last-child {
-  @apply border-r border-black;
+  tr.multi-row+tr.multi-row th {
+    @apply pt-0;
+  }
+
+  tr th:last-child {
+    @apply border-r border-gray-200;
+  }
 }

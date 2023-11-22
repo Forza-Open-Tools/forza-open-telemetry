@@ -17,39 +17,39 @@ const format = computed(() => props.formatter || defaultFormatter);
 <template>
   <table>
     <tr>
-      <th class="border-r border-black" colspan="6">{{ label }}</th>
+      <th class="border-r border-grey-200" colspan="6">{{ label }}</th>
     </tr>
     <tr class="multi-row">
-      <th class="border-r border-black" colspan="3">Left</th>
-      <th class="border-r border-black" colspan="3">Right</th>
+      <th class="border-r border-grey-200" colspan="3">Left</th>
+      <th class="border-r border-grey-200" colspan="3">Right</th>
     </tr>
     <tr class="multi-row">
-      <th class="border-r border-black" colspan="3">Front</th>
-      <th class="border-r border-black" colspan="3">Rear</th>
+      <th class="border-r border-grey-200" colspan="3">Front</th>
+      <th class="border-r border-grey-200" colspan="3">Rear</th>
     </tr>
     <tr class="multi-row">
       <th>min</th>
       <th>max</th>
-      <th class="border-r border-black">avg</th>
+      <th class="border-r border-grey-200">avg</th>
       <th>min</th>
       <th>max</th>
-      <th class="border-r border-black">avg</th>
+      <th class="border-r border-grey-200">avg</th>
     </tr>
     <tr>
       <td>{{ format(stats.front.left.min) }}</td>
-      <td>{{ format(stats.front.left.min) }}</td>
-      <td class="border-r border-black">{{ format(stats.front.left.avg) }}</td>
-      <td>{{ format(stats.front.right.min) }}</td>f
+      <td>{{ format(stats.front.left.max) }}</td>
+      <td class="border-r border-grey-200">{{ format(stats.front.left.avg) }}</td>
       <td>{{ format(stats.front.right.min) }}</td>
-      <td class="border-r border-black">{{ format(stats.front.right.avg) }}</td>
+      <td>{{ format(stats.front.right.max) }}</td>
+      <td class="border-r border-grey-200">{{ format(stats.front.right.avg) }}</td>
     </tr>
     <tr>
       <td>{{ format(stats.rear.left.min) }}</td>
-      <td>{{ format(stats.rear.left.min) }}</td>
-      <td class="border-r border-black">{{ format(stats.rear.left.avg) }}</td>
-      <td>{{ format(stats.rear.right.min) }}</td>f
+      <td>{{ format(stats.rear.left.max) }}</td>
+      <td class="border-r border-grey-200">{{ format(stats.rear.left.avg) }}</td>
       <td>{{ format(stats.rear.right.min) }}</td>
-      <td class="border-r border-black">{{ format(stats.rear.right.avg) }}</td>
+      <td>{{ format(stats.rear.right.max) }}</td>
+      <td class="border-r border-grey-200">{{ format(stats.rear.right.avg) }}</td>
     </tr>
   </table>
 </template>

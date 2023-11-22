@@ -17,7 +17,8 @@ export function formatLapTime(time: number): string {
 
 const kphConversion = 0.6213711922;
 
-export function calcSpeed(speed: number, toImperial = false): number {
+export function calcSpeed(speed: number | undefined, toImperial = false): number {
+  if (!speed) return 0;
   const kph = speed * 3.6;
   const converted = toImperial ? kph * kphConversion : kph;
 

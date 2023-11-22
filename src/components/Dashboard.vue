@@ -1,68 +1,27 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
-import { useTelemetry } from '../helpers';
-import { useRaceStore } from '../store';
+import { useRaceStore, useSettings } from '../stores';
 import StatisticsForLap from './StatisticsForLap.vue';
 import TelemetryMoment from './TelemetryMoment.vue';
 import FileDragAndDrop from './FileDragAndDrop.vue';
 import RaceList from './RaceList.vue';
-
-const state = reactive({
-  wrapperClass: '',
-  show: {
-    travelPath: false,
-    suspension: false,
-    telemetryTable: false,
-  },
-});
+import SettingsEdit from './SettingsEdit.vue';
 
 const store = useRaceStore();
-
-const telemetry = useTelemetry();
-
-const streamingButtonText = computed(() => telemetry.state.streaming ? 'Stop' : 'Start');
-
-function onToggleCollector() {
-  if (telemetry.state.streaming) {
-    telemetry.disconnect();
-  } else {
-    telemetry.connect();
-  }
-}
+const settings = useSettings();
 </script>
 
 <template>
   <FileDragAndDrop>
+    <SettingsEdit />
     <RaceList />
-    <div class="flex items-center p-2 border-b border-gray-700">
-      <label>
-        <input type="checkbox" v-model="state.show.travelPath" />
-        Show Travel Path
-      </label>
-      <label class="ml-8">
-        <input type="checkbox" v-model="state.show.suspension" />
-        Show Suspension
-      </label>
-      <label class="ml-8">
-        <input type="checkbox" v-model="state.show.telemetryTable" />
-        Show Detail Table
-      </label>
-      <button class="ml-8" type="button" @click="onToggleCollector">{{ streamingButtonText }} Collector</button>
 
-      <div v-if="telemetry.state.streaming">Listening on {{ telemetry.state.address }}:{{ telemetry.state.port }}</div>
-      <!-- <div>
-        <label>Throttle:</label>
-        <input type="text" v-model="state.throttle" />
-      </div>
-      <div>Tire slip index: {{ state.slipIndex }}</div> -->
-    </div>
+
+
     <template v-if="store.selectedRace?.laps.length">
       <!-- <h2>{{ socket.connected ? 'Connected' : 'Disconnected' }}</h2> -->
       <TelemetryMoment />
-      <div v-if="store.selectedLap" class="flex">
-        <StatisticsForLap :lap="store.selectedLap" />
-        <!-- <Suspension v-if="state.show.suspension" :telemetry="selectedLap.telemetry" /> -->
-      </div>
+      <StatisticsForLap v-if="store.selectedLap && settings.show.telemetryTable" :lap="store.selectedLap" />
+      <!-- <Suspension v-if="state.show.suspension" :telemetry="selectedLap.telemetry" /> -->
       <!-- <RawTelemetry v-if="state.show.telemetryTable" :lap="selectedLap" /> -->
     </template>
   </FileDragAndDrop>

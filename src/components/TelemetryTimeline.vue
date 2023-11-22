@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { ITelemetryLap } from '../lib/types';
-import { useRaceStore } from '../store';
+import { useRaceStore } from '../stores';
 
 const store = useRaceStore();
 

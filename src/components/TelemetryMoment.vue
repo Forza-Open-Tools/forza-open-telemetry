@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { CarCorner } from '../lib/types';
-import { useRaceStore } from '../store';
+import { useRaceStore, useSettings } from '../stores';
 import { useDocumentEvent } from '../helpers';
 import TelemetryCorner from './TelemetryCorner.vue';
 import TelemetryMap from './TelemetryMap.vue';
 import TelemetryTimeline from './TelemetryTimeline.vue';
 import LapTable from './LapTable.vue';
-import Speedometer from './Speedometer.vue';
+import InstrumentCluster from './InstrumentCluster.vue';
 
 const store = useRaceStore();
+const settings = useSettings();
 
 const arrowKeys: Record<string, number> = {
   ArrowLeft: -1,
@@ -54,57 +55,27 @@ keydown.activate();
       :max="lap.telemetry.length - 1"
     />
   </div>-->
+
   <div class="flex w-full mt-8">
-    <div class="flex flex-col justify-between">
-      <TelemetryCorner :corner="CarCorner.frontLeft" :data="store.currentDataPoint!" />
-      <TelemetryCorner :corner="CarCorner.rearLeft" :data="store.currentDataPoint!" />
-    </div>
-    <div class="w-32 flex items-center">
-      <Speedometer :car="store.selectedRace!.car" :row="store.currentDataPoint!" />
-    </div>
-    <div class="flex flex-col justify-between">
-      <TelemetryCorner :corner="CarCorner.frontRight" :data="store.currentDataPoint!" />
-      <TelemetryCorner :corner="CarCorner.rearRight" :data="store.currentDataPoint!" />
+    <div class="flex flex-col">
+      <InstrumentCluster />
+      <div class="flex justify-between">
+        <div class="flex flex-col justify-between">
+          <TelemetryCorner :corner="CarCorner.frontLeft" :data="store.currentDataPoint!" />
+          <TelemetryCorner :corner="CarCorner.rearLeft" :data="store.currentDataPoint!" />
+        </div>
+        <div class="flex items-center">
+        </div>
+        <div class="flex flex-col justify-between">
+          <TelemetryCorner :corner="CarCorner.frontRight" :data="store.currentDataPoint!" />
+          <TelemetryCorner :corner="CarCorner.rearRight" :data="store.currentDataPoint!" />
+        </div>
+      </div>
     </div>
     <div class="w-[300px] mx-4 flex flex-col justify-between">
       <div>
         <LapTable />
-        <!-- <table class="font-bold mt-8 text-right">
-          <tbody>
-            <tr>
-              <td>Average Lap Time:</td>
-              <td>{{ formatLapTime(averageLapTime * 1000) }}</td>
-            </tr>
-            <tr>
-              <td>Current Race Time:</td>
-              <td>{{ formatLapTime(currentRow.currentRaceTime * 1000) }}</td>
-            </tr>
-            <tr>
-              <td>Current Lap Time:</td>
-              <td>{{ formatLapTime(currentRow.currentLapTime * 1000) }}</td>
-            </tr>
-            <tr>
-              <td>Top Speed This Lap:</td>
-              <td>{{ formatSpeed(lap.stats.speed.max) }}</td>
-            </tr>
-            <tr>
-              <td>Min Speed This Lap:</td>
-              <td>{{ formatSpeed(lap.stats.speed.min) }}</td>
-            </tr>
-            <tr>
-              <td>Avg Speed This Lap:</td>
-              <td>{{ formatSpeed(lap.stats.speed.avg) }}</td>
-            </tr>
-            <tr>
-              <td>Top Speed Overall:</td>
-              <td>{{ formatSpeed(overallSpeed.max) }}</td>
-            </tr>
-            <tr>
-              <td>Avg Speed Overall:</td>
-              <td>{{ formatSpeed(overallSpeed.avg) }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <!--
 
         <div class="text-3xl font-bold mt-10 flex items-center">
           <div class="w-28">Speed:</div>
@@ -119,7 +90,7 @@ keydown.activate();
         </div> -->
       </div>
     </div>
-    <div class="relative w-[500px] h-[500px]">
+    <div v-if="settings.show.travelPath" class="relative w-[500px] h-[500px]">
       <TelemetryMap v-for="l in store.selectedRace!.laps" :key="l.lap" :lap="l" class="absolute top-0 left-0"
         :class="{ 'z-20': l.lap === store.selectedLap!.lap }"
         :current="l.lap === store.selectedLap!.lap ? store.currentDataPoint : null" />
@@ -138,7 +109,7 @@ keydown.activate();
 }
 
 .timeline-line {
-  @apply left-0 w-full h-2 bg-black;
+  @apply left-0 w-full h-2 bg-gray-600;
 }
 
 .marker {

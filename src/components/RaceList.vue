@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRaceStore } from '../store';
+import { useRaceStore } from '../stores';
 
 const raceStore = useRaceStore();
 
@@ -10,6 +10,7 @@ const raceStore = useRaceStore();
     <div
       v-for="(race, index) of raceStore.races"
       class="cursor-pointer"
+      :class="{ 'font-bold': index === raceStore.selected.race }"
       @click="raceStore.selectRace(index)"
     >
       {{ race.car.make }}

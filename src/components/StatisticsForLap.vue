@@ -13,7 +13,7 @@ function formatTemp(value: number) {
 
 </script>
 <template>
-  <div class="flex">
+  <div class="flex items-end">
     <table>
       <tr>
         <th>&nbsp;</th>
@@ -33,6 +33,6 @@ function formatTemp(value: number) {
       :stats="lap.stats.normalizedSuspensionTravel"
       :formatter="formatAsPercent"
     />
-    <StatisticsTable label="Tire Temp" :stats="lap.stats.tireTemp" />
+    <StatisticsTable label="Tire Temp" :stats="lap.stats.tireTemp" :formatter="formatAsTemp" />
   </div>
 </template>

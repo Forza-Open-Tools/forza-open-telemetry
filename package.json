@@ -12,6 +12,7 @@
     "name": "Aaron Throckmorton",
     "email": "aaron@throckmortons.com"
   },
+  "type": "module",
   "repository": "https://github.com/Forza-Open-Tools/forza-open-telemetry",
   "main": "dist/electron/main.js",
   "scripts": {
@@ -27,6 +28,7 @@
   },
   "dependencies": {
     "buffer": "^6.0.3",
+    "canvas-gauges": "^2.1.7",
     "change-case": "^5.2.0",
     "chart.js": "^4.4.0",
     "dayjs": "^1.11.10",

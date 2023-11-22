@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { Chart as ChartJS, ChartData, ChartDataset, ChartOptions, PointElement, LineElement, Tooltip, Legend } from 'chart.js';
 import { Scatter } from 'vue-chartjs'
-import { useRaceStore } from '../store';
+import { useRaceStore } from '../stores';
 
 const store = useRaceStore();
 

@@ -31,14 +31,30 @@ const spring = computed(() => ({
 
 <style>
 .spring {
-  @apply w-[20px] h-[175px] border border-black relative mx-4;
+  @apply
+    w-[20px]
+    h-[175px]
+    border
+    border-gray-200
+    relative
+    mx-4;
 }
 
 .spring-label {
-  @apply text-sm h-[175px] w-10 flex items-center;
+  @apply
+    text-sm
+    h-[175px]
+    w-10
+    flex
+    items-center;
 }
 
 .spring-level {
-  @apply absolute bottom-0 left-0 w-full bg-red-700;
+  @apply
+    absolute
+    bottom-0
+    left-0
+    w-full
+    bg-red-700;
 }
 </style>

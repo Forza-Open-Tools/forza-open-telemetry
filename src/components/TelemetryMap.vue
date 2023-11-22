@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { getLapColorClass } from '../lib';
 import { ITelemetryDataPoint, ITelemetryLap } from '../lib/types';
-import { useRaceStore } from '../store';
+import { useRaceStore } from '../stores';
 
 const props = defineProps<{
   lap: ITelemetryLap;
